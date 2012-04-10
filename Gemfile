@@ -6,6 +6,7 @@ group :test, :development do
   gem 'guard'
   gem 'guard-rspec'
   gem 'ruby-debug19', :platforms => :mri_19
+  gem 'cucumber', "~> 1.1.9"
 end
 
 group :test do
