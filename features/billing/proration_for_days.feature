@@ -1,4 +1,5 @@
 # https://www.pivotaltracker.com/story/show/27626017
+@wip
 Feature: Calculate the Proration Amount
   As a marketing manager
   I want for existing customer to be encouraged to subscribe to new products
