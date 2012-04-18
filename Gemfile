@@ -5,12 +5,15 @@ gemspec
 group :test, :development do
   gem 'guard'
   gem 'guard-rspec'
+  gem 'guard-cucumber'
   gem 'ruby-debug19', :platforms => :mri_19
-  gem 'cucumber', "~> 1.1.9"
 end
 
 group :test do
   gem 'rspec'
   gem 'shoulda'
   gem 'rake'
+  gem 'ZenTest'
+  gem 'cucumber'
+  gem 'timecop'
 end
