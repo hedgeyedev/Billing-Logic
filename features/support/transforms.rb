@@ -29,10 +29,4 @@ ASSERTION = Transform /^(|don't |do not |)$/ do |assertion|
   !(assertion =~ /(don't |do not |ain't )/)
 end
 
-SYSTEM = Transform /(the system|it)/ do | system |
-  'system'
-end
 
-SUBSCRIBER = Transform /(the subscriber|he|she)/ do | subscriber |
-  'subscriber'
-end
