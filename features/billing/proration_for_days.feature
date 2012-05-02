@@ -36,30 +36,6 @@ Feature: Calculate the Proration Amount
 
 # No Pivotal card
 # billing engine or logic
-  Scenario: Cancellation fails after add operations - retry
-    Given a subscriber has committed his request some adds and cancellations
-    And all of the affected subscriptions have the same price
-    When the adds have been added successfully
-    But one of the cancellations fails
-    Then inform the subscriber that his subscriptions have been successfully added
-    And inform him which cancellations succeeded
-    But that the failed cancellation happened and instructions on what to do next
-
-# No Pivotal card
-# billing engine or logic
-  Scenario: Add operation fails before Cancellations
-    Given a subscriber has committed his request some adds and cancellations
-    And all of the affected subscriptions have the same price
-    When the system processes all of the adds
-    And one of the adds fails
-    Then the system continues with the remaining adds that it hasn't processed yet
-    And it does NOT process any of the cancellations
-    And inform the subscriber which adds succeeded
-    And that it has not performed any of the cancellations
-    And instructions on what to do next
-
-# No Pivotal card
-# billing engine or logic
   Scenario: User Cancels Pro Product and Adds Different Pro Product with different price - Append Time
     Given a subscriber chooses to cancel a subscription
     And subscribe to a product with a different price
