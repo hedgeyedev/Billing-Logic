@@ -18,8 +18,8 @@ Feature: Single Payment Strategy
     Given I support a Single Payment Strategy
     And   Today is 3/10/12
     And   I have the following subscriptions:
-     #| billing profile                                 | status | comments                                          | next billing date |
-      | (A @ $30/mo & B @ $20/mo & C @ $20/mo) @ $70/mo | active | with current permissions and the next billing date is on | 4/1/12     |
+    # | billing profile                   | status    | #comments                                                | next billing date   |
+      | (A @ $30/mo & B @ $20/mo & C @ $20/mo) @ $70/mo | active    | with current permissions and the next billing date is on | 4/1/12              |
     When  I change to having: <desired state>
     Then  I expect the following action: <action>
     Examples: Removing all products
