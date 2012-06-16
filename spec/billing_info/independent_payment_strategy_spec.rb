@@ -178,7 +178,7 @@ module BillingLogic
         it "should add monthly plan at the end of the year when switching to monthly cycle" do
           strategy.desired_state = [product_a]
           strategy.should_receive(:create_recurring_payment_command).with([product_a], hash_including(:paid_until_date => profile_a.paid_until_date)).once
-          strategy.should_receive(:cancel_recurring_payment_command).with(profile_a.identifier, {}).once
+          strategy.should_receive(:cancel_recurring_payment_command).with(profile_a, {}).once
           strategy.command_list 
           # Note: I used the following for debugging, but leaving it inside
           # would couple the tests for the strategy with the command builder as
