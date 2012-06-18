@@ -182,11 +182,9 @@ module BillingLogic::Strategies
 
     def issue_refunds_if_necessary(profile)
       ret = {}
-      removed_products_from_profile(profile).map do |removed_product|
-        unless profile.refundable_payment_amount(removed_product).zero?
-          ret.merge!(refund_recurring_payments_command(profile.identifier, profile.refundable_payment_amount(*removed_product)))
-          ret.merge!(disable_subscription(profile.identifier))
-        end
+      unless profile.refundable_payment_amount(removed_products_from_profile(profile)).zero?
+        ret.merge!(refund_recurring_payments_command(profile.identifier, profile.refundable_payment_amount(removed_products_from_profile(profile))))
+        ret.merge!(disable_subscription(profile.identifier))
       end
       ret
     end
