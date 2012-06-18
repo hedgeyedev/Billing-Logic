@@ -28,6 +28,20 @@ Feature: Same Day Cancellation Policy
       | Independent Payment Strategy | 24 hours                  | paid $20 for A @ $30 on 3/15/12 | nothing       | cancel and disable [A @ $30/mo] with refund $20.00 now |
       | a Single Payment Strategy    | 24 hours                  | paid $20 for A @ $30 on 3/15/12 | nothing       | cancel and disable [A @ $30/mo] with refund $20.00 now |
 
+  Scenario Outline: User subscribes to multiple, then cancels within the grace period
+    Given I support <strategy>
+    And   The cancellation grace period is of <grace period>
+    And   Today is 3/15/12
+    And   I have the following subscriptions:
+     #| product names | status | comments                                                 | next billing date |
+      | (A @ $30/mo & B @ $40/mo & C @ $25/mo) @ $95/mo | active | and the next billing date is on | 4/1/12 |
+    And   I made the following payment: <payment made>
+    When  I change to having: <desired state>
+    Then  I expect the following action: <actions>
+    Examples: A customer that have made a payment of $30 the same day of cancellation
+      | strategy                     | grace period | payment made                    | desired state | actions                    |
+      | Independent Payment Strategy | 24 hours     | paid $30 for A @ $30 on 3/15/12 | nothing       | cancel and disable [(A @ $30/mo & B @ $40/mo & C @ $25/mo) @ $95/mo] with refund $30.00 now |
+      | Independent Payment Strategy | 24 hours     | paid $30 for A @ $30 on 3/15/12 | B @ $40/mo    | remove (A @ $30/mo & C @ $25/mo) from [(A @ $30/mo & B @ $40/mo & C @ $25/mo) @ $95/mo] with refund $30.00 now |
 
   Scenario Outline: User subscribes, then cancels not within the grace period
     Given I support <strategy>
