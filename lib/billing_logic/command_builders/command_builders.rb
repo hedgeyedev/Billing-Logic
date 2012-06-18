@@ -57,7 +57,7 @@ module BillingLogic
         when :cancel
           "cancel #{'and disable ' if disable}[#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
         when :remove
-          "remove (#{products.map { |product| product.identifier }.join(" & ")}) from [#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)}" if refund}now"
+          "remove (#{products.map { |product| product.identifier }.join(" & ")}) from [#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
         when :add
           products.map do |product|
             initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
