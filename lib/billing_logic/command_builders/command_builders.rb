@@ -32,7 +32,7 @@ module BillingLogic
         product.price = Float($2)
         product.identifier = "#{$1} @ $#{$2}#{$3}"
         product.billing_cycle = billing_cycle
-        product.initial_payment = 0
+        product.initial_payment = options[:initial_payment] || 0
         product
       end
 
@@ -158,7 +158,6 @@ module BillingLogic
                                       :products   => products,
                                       :starts_on  => opts[:paid_until_date],
                                       :when       => time.now))
-          
         end
       end
     end
