@@ -2,8 +2,10 @@ And /^I made the following payment: paid (#{MONEY}) for (#{PRODUCT_FORMATTING}) 
   payment_date = str_to_date(payment_date)
   strategy.current_state.each do |profile|
     profile.products.each do |product|
-      if product.name == profile_object.first.name
-        create_payment_for_profile_at_date(profile, amount, payment_date)
+      profile_object.each do |obj|
+        if product.name == obj.name
+          create_payment_for_profile_at_date(profile, amount, payment_date)
+        end
       end
     end
   end

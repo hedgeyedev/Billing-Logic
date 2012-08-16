@@ -49,16 +49,9 @@ module StringParsers
      Date.strptime(string, '%m/%d/%y')
   end
 
-  def str_to_product_formatting(strings)
-    strings.split(/ & /).map do |string|
-      string =~ SINGLE_PRODUCT_REGEX
-      billing_cycle = $3 ? BillingLogic::BillingCycle.new(:frequency => 1, :period => $3.include?('mo') ? :month : :year) : nil
-      OpenStruct.new(:name => $1, 
-                     :price => $2.to_i, 
-                     :identifier => "#{$1} @ $#{$2}#{$3}", 
-                     :billing_cycle => billing_cycle, 
-                     :payments => [],
-                     :initial_payment => 0)
+  def str_to_product_formatting(str)
+    str.split(/ & /).map do |string|
+      BillingLogic::CommandBuilders::ProductStub.parse(string)
     end
   end
 
@@ -67,10 +60,11 @@ module StringParsers
   end
 
   def command_list_should_include(command, bool = true)
+    command_list = strategy.command_list.map { |obj| obj.to_s }
     if bool
-      strategy.command_list.should include(command)
+      command_list.should include(BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s)
     else
-      strategy.command_list.should_not include(command)
+      command_list.should_not include(BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s)
     end
   end
 
