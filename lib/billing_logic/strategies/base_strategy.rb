@@ -118,7 +118,7 @@ module BillingLogic::Strategies
 
     # for easy stubbing/subclassing/replacement
     def today
-      Date.today
+      Date.current
     end
 
     public
@@ -206,7 +206,7 @@ module BillingLogic::Strategies
       payment_command_builder_class.remove_product_from_payment_profile(profile_id, removed_products, opts)
     end
 
-    def create_recurring_payment_command(products, opts = {:paid_until_date => Date.today})
+    def create_recurring_payment_command(products, opts = {:paid_until_date => Date.current})
       payment_command_builder_class.create_recurring_payment_commands(products, opts)
     end
 

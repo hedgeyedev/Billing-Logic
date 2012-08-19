@@ -4,13 +4,13 @@ module BillingLogic
     let(:monthly_cycle) do
           BillingCycle.new(:period => :month, 
                            :frequency => 1,
-                           :anniversary => Date.today - 7)
+                           :anniversary => Date.current - 7)
     end
 
     let(:yearly_cycle) do
       BillingCycle.new(:period => :year, 
                        :frequency => 1,
-                       :anniversary => Date.today - 7)
+                       :anniversary => Date.current - 7)
     end
     let(:product_a) { mock('Product A', :name => 'A', :price => 10, :billing_cycle => monthly_cycle) }
     let(:product_b) { mock('Product B', :name => 'B', :price => 10, :billing_cycle => monthly_cycle) }

@@ -10,13 +10,13 @@ module BillingLogic
     let(:monthly_cycle) do
       BillingCycle.new(:period => :month, 
                        :frequency => 1,
-                       :anniversary => Date.today - 7)
+                       :anniversary => Date.current - 7)
     end
 
     let(:yearly_cycle) do
       BillingCycle.new(:period => :year, 
                        :frequency => 1,
-                       :anniversary => Date.today - 7)
+                       :anniversary => Date.current - 7)
     end
 
     let(:product_a) { MockProduct.new(:identifier => 1, :name => 'A', :price => 10, :billing_cycle => monthly_cycle, :initial_payment => 0.0) }
@@ -86,7 +86,7 @@ module BillingLogic
       it "should return products that are not in the current state" do
         strategy.current_state = []
         strategy.desired_state = [product_a]
-        strategy.products_to_be_added_grouped_by_date.should == [[[product_a], Date.today]]
+        strategy.products_to_be_added_grouped_by_date.should == [[[product_a], Date.current]]
       end
     end
 
@@ -126,7 +126,7 @@ module BillingLogic
         end
 
         it "should call create_recurring_payment_command with 1 product on the command builder object" do
-          strategy.payment_command_builder_class.should_receive(:create_recurring_payment_commands).with([product_a], :paid_until_date => Date.today).once
+          strategy.payment_command_builder_class.should_receive(:create_recurring_payment_commands).with([product_a], :paid_until_date => Date.current).once
           strategy.command_list
         end
 
