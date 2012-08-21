@@ -114,7 +114,7 @@ module BillingLogic
 
     class BasicBuilder
       class << self
-        def create_recurring_payment_commands(products, opts = {:paid_until_date => Date.today})
+        def create_recurring_payment_commands(products, opts = {:paid_until_date => Date.current})
           raise Exception.new('Implement me')
         end
 
@@ -141,7 +141,7 @@ module BillingLogic
 
     class WordBuilder < BasicBuilder
       class << self
-        def create_recurring_payment_commands(products, opts = {:paid_until_date => Date.today})
+        def create_recurring_payment_commands(products, opts = {:paid_until_date => Date.current})
           ActionObject.new(opts.merge(:action     => :add,
                                       :products   => products,
                                       :starts_on  => opts[:paid_until_date],
@@ -153,7 +153,7 @@ module BillingLogic
     class AggregateWordBuilder < BasicBuilder
       class << self
         include CommandBuilders::BuilderHelpers
-        def create_recurring_payment_commands(products, opts = {:paid_until_date => Date.today, :price => nil, :frequency => 1, :period => nil})
+        def create_recurring_payment_commands(products, opts = {:paid_until_date => Date.current, :price => nil, :frequency => 1, :period => nil})
           ActionObject.new(opts.merge(:action     => :add_bundle,
                                       :products   => products,
                                       :starts_on  => opts[:paid_until_date],

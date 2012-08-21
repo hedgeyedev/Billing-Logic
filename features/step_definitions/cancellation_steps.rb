@@ -26,7 +26,7 @@ end
 #         if product.name == str_to_product_formatting(row[0]).name
 #           profile.last_payment = OpenStruct.new(:amount => row[1],
 #                                                 :payment_date => str_to_date(row[2]),
-#                                                 :refundable? => (Date.today - str_to_date(row[2])).to_i <= grace_period)
+#                                                 :refundable? => (Date.current - str_to_date(row[2])).to_i <= grace_period)
 #           def profile.last_payment_refundable?
 #             last_payment.refundable?
 #           end

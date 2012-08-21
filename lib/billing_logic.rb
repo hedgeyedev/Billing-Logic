@@ -4,6 +4,7 @@ require 'billing_logic/billing_cycle'
 require 'billing_logic/proration_calculator'
 require 'billing_logic/payment_command_builder'
 require 'billing_logic/command_builders/command_builders'
+require 'active_support/core_ext/date/calculations'
 module BillingLogic
   module CommandBuilders
     autoload :BuilderHelpers, 'billing_logic/command_builders/command_builders'

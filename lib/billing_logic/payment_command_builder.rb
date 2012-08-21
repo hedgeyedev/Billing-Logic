@@ -13,7 +13,7 @@ module BillingLogic
     end
 
     class << self
-      def create_recurring_payment_commands(products, next_payment_date = Date.today)
+      def create_recurring_payment_commands(products, next_payment_date = Date.current)
         self.new(products).group_products_by_billing_cycle.map do |k, prods|
           {
             :action => 'create_recurring_payment',

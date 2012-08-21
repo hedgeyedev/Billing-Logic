@@ -28,7 +28,7 @@ end
 
 module StringParsers
 
-  def str_to_billing_cycle(string, anniversary = Date.today)
+  def str_to_billing_cycle(string, anniversary = Date.current)
     billing_cycle = BillingLogic::BillingCycle.new
     case string
     when /every (\d+)\s(\w+)$/
