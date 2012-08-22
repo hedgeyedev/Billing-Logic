@@ -20,7 +20,9 @@ Project.configure do |project|
   project.build_command = './config/cruise/run_cruise.sh'
 
   # Now GitHub is sending notifications when repository contents change.
-  project.scheduler.polling_interval = 24.hours
+  #project.scheduler.polling_interval = 24.hours # Isn't working yet
+  project.scheduler.polling_interval = 2.minutes
+
 
   project.source_control = SourceControl::Git.new :repository => "git@github.com:hedgeyedev/Billing-Logic.git", :branch => 'master'
 
