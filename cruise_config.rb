@@ -17,12 +17,11 @@ Project.configure do |project|
   # Build the project by invoking shell script "build_my_app.sh". Keep in mind that when the script is invoked,
   # current working directory is <em>[cruise&nbsp;data]</em>/projects/your_project/work, so if you do not keep build_my_app.sh
   # in version control, it should be '../build_my_app.sh' instead
-  project.build_command = './config/cruise/run_cruise.sh'
+  project.build_command = 'bundle exec ./config/cruise/run_cruise.sh'
 
-  # Ping Subversion for new revisions every 5 minutes (default: 30 seconds)
+  # Ping Git for new revisions every 5 minutes (default: 30 seconds)
   project.scheduler.polling_interval = 5.minutes
 
-  # Am building from the master branch until branch 'develop' comes into effect:
   project.source_control = SourceControl::Git.new :repository => "git@github.com:hedgeyedev/Billing-Logic.git", :branch => 'master'
 
 end
