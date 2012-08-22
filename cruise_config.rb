@@ -19,8 +19,8 @@ Project.configure do |project|
   # in version control, it should be '../build_my_app.sh' instead
   project.build_command = 'bundle exec ./config/cruise/run_cruise.sh'
 
-  # Ping Git for new revisions every 5 minutes (default: 30 seconds)
-  project.scheduler.polling_interval = 5.minutes
+  # Now GitHub is sending notifications when repository contents change.
+  project.scheduler.polling_interval = 24.hours
 
   project.source_control = SourceControl::Git.new :repository => "git@github.com:hedgeyedev/Billing-Logic.git", :branch => 'master'
 
