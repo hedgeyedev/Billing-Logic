@@ -50,7 +50,7 @@ module BillingLogic::Strategies
     end
 
     def removed_obsolete_subscriptions(subscriptions)
-      subscriptions.reject{|sub| !sub.paid_until_date || sub.paid_until_date < today }
+      [subscriptions.select{ |sub| sub.active_or_pending? } + subscriptions.reject { |sub| !sub.paid_until_date || sub.paid_until_date < today } ].flatten.compact.uniq
     end
 
     def calculate_list
