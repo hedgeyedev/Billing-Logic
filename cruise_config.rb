@@ -19,10 +19,11 @@ Project.configure do |project|
   # in version control, it should be '../build_my_app.sh' instead
   project.build_command = './config/cruise/run_cruise.sh'
 
-  # Ping Subversion for new revisions every 5 minutes (default: 30 seconds)
-  project.scheduler.polling_interval = 5.minutes
+  # Now GitHub is sending notifications when repository contents change.
+  #project.scheduler.polling_interval = 24.hours # Isn't working yet
+  project.scheduler.polling_interval = 2.minutes
 
-  # Am building from the master branch until branch 'develop' comes into effect:
+
   project.source_control = SourceControl::Git.new :repository => "git@github.com:hedgeyedev/Billing-Logic.git", :branch => 'master'
 
 end
