@@ -17,10 +17,13 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
-  s.add_dependency "activesupport"
+  s.add_dependency("activesupport", '~> 3.2')
 
-  s.add_development_dependency "rspec"
-  # specify any dependencies here; for example:
-  # s.add_development_dependency "rspec"
-  # s.add_runtime_dependency "rest-client"
+  s.add_development_dependency("rspec", '~> 2.12')
+  s.add_development_dependency('rake', '~> 10.0')
+  s.add_development_dependency('cucumber', '~> 1.2')
+  s.add_development_dependency('timecop', '~> 0.5')
+  s.add_development_dependency('guard', '~> 1.6')
+  s.add_development_dependency('guard-rspec', '~> 2.4')
+  s.add_development_dependency('guard-cucumber', '~> 1.3')
 end
