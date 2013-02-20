@@ -1,9 +1,9 @@
 #!/bin/bash -li
 set -o errexit
-echo '*** starting Billing-Logic build ***'
+echo '*** starting Billing-Logic build ***' &>/dev/stderr
 rvm rvmrc trust .
 source .rvmrc
-echo '*** before whoami ***'
+echo '*** before whoami ***' &>/dev/stderr
 whoami &>/dev/stderr
 bundle install
 billing
