@@ -1,6 +1,7 @@
 #!/bin/bash -li
 set -o errexit
 echo '*** starting Billing-Logic build ***'
+rvm rvmrc trust .
 source .rvmrc
 echo '*** before whoami ***'
 whoami &>/dev/stderr
