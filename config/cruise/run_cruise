@@ -1,0 +1,7 @@
+#!/bin/bash -li
+set -o errexit
+echo '*** starting Billing-Logic build ***'
+source .rvmrc
+bundle install
+billing
+bundle exec rake ci"
