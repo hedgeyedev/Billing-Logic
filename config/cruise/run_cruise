@@ -2,6 +2,8 @@
 set -o errexit
 echo '*** starting Billing-Logic build ***'
 source .rvmrc
+echo '*** before whoami ***'
+whoami &>/dev/stderr
 bundle install
 billing
 bundle exec rake ci"
