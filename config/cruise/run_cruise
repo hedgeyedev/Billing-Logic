@@ -6,5 +6,4 @@ source .rvmrc
 echo '*** before whoami ***' &>/dev/stderr
 whoami &>/dev/stderr
 bundle install
-billing
-bundle exec rake ci"
+bundle exec rake ci
