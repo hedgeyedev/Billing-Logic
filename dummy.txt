@@ -1,1 +1,0 @@
-A temporary file for testing GitHub push notifications to Jenkins.
