@@ -1,9 +1,4 @@
-#!/bin/bash -li
+#!/bin/bash
 set -o errexit
-echo '*** starting Billing-Logic build ***' &>/dev/stderr
-rvm rvmrc trust .
-source .rvmrc
-echo '*** before whoami ***' &>/dev/stderr
-whoami &>/dev/stderr
 bundle install
 bundle exec rake ci
