@@ -1,0 +1,3 @@
+--db .yardoc
+--output-dir .documents
+yardoc lib/**/*.rb
