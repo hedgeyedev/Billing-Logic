@@ -19,6 +19,11 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.add_dependency("activesupport", '~> 3.2')
 
+  # because activesupport forgot to require tzinfo
+  # see https://github.com/rails/rails/issues/4909
+  # can remove once we upgrade activesupport
+  s.add_development_dependency("tzinfo")
+
   s.add_development_dependency("rspec", '~> 2.12')
   s.add_development_dependency('rake', '~> 10.0')
   s.add_development_dependency('cucumber', '~> 1.2')
