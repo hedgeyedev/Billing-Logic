@@ -39,6 +39,8 @@ module BillingLogic
     end
 
     class ActionObject
+      STRFTIME = '%m/%d/%y'
+
       attr_accessor :action, :products, :profile_id, :initial_payment, :disable, :refund, :starts_on
 
       def initialize(opts = {})
@@ -61,14 +63,14 @@ module BillingLogic
         when :add
           products.map do |product|
             initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-            "add (#{product.identifier}) on #{starts_on.strftime('%m/%d/%y')}#{initial_payment_string}"
+            "add (#{product.identifier}) on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
           end.to_s
         when :add_bundle
           product_ids = products.map { |product| product.identifier }.join(' & ')
           price ||= products.inject(0){ |k, product| k += product.price; k }
           price_string = BuilderHelpers.money(price)
           initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-          "add (#{product_ids}) @ $#{price_string}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime('%m/%d/%y')}#{initial_payment_string}"
+          "add (#{product_ids}) @ $#{price_string}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
         end
       end
 
