@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   # can remove once we upgrade activesupport
   s.add_development_dependency("tzinfo")
 
+  s.add_development_dependency("awesome_print")
   s.add_development_dependency("rspec", '~> 2.12')
   s.add_development_dependency('rake', '~> 10.0')
   s.add_development_dependency('cucumber', '~> 1.2')
