@@ -55,23 +55,32 @@ module BillingLogic
       end
 
       def to_s
-        case action
-        when :cancel
-          "cancel #{'and disable ' if disable}[#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
-        when :remove
-          "remove (#{products.map { |product| product.identifier }.join(" & ")}) from [#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
-        when :add
-          products.map do |product|
-            initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-            "add (#{product.identifier}) on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
-          end.to_s
-        when :add_bundle
-          product_ids = products.map { |product| product.identifier }.join(' & ')
-          price ||= products.inject(0){ |k, product| k += product.price; k }
-          price_string = BuilderHelpers.money(price)
-          initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-          "add (#{product_ids}) @ $#{price_string}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
+        if [:cancel, :remove, :add, :add_bundle].include?(action)
+          send("#{action.to_s}_action_string")
         end
+      end
+
+      def cancel_action_string
+        "cancel #{'and disable ' if disable}[#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
+      end
+
+      def remove_action_string
+        "remove (#{products.map { |product| product.identifier }.join(" & ")}) from [#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
+      end
+
+      def add_action_string
+        products.map do |product|
+          initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
+          "add (#{product.identifier}) on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
+        end.to_s
+      end
+
+      def add_bundle_action_string
+        product_ids = products.map { |product| product.identifier }.join(' & ')
+        price ||= products.inject(0){ |k, product| k += product.price; k }
+        price_string = BuilderHelpers.money(price)
+        initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
+        "add (#{product_ids}) @ $#{price_string}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
       end
 
       def self.from_string(string, options = {:product_class => ProductStub})
