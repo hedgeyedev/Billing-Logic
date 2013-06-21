@@ -1,7 +1,7 @@
 = Billing Logic
-BillingAccount
-Product
-Subscription
+- BillingAccount
+- Product
+- Subscription
 
 == BillingLogic::Strategies
 There currently 2 strategies available: IndependentPaymentStrategy & SinglePaymentStrategy
