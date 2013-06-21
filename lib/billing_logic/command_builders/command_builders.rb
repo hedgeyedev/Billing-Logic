@@ -11,6 +11,8 @@ module BillingLogic
     end
 
     class ProductList
+      # ProductList.parse returns a dumb array
+      # You can't add behavior (I tried adding #price)
       def self.parse(string, options = {})
         if (products = (string =~ /\(([^\(\)]*)\)/) ? $1 : nil)
           products.split(/ & /).map do |product_string|
@@ -78,9 +80,8 @@ module BillingLogic
       def add_bundle_action_string
         product_ids = products.map { |product| product.identifier }.join(' & ')
         price ||= products.inject(0){ |k, product| k += product.price; k }
-        price_string = BuilderHelpers.money(price)
         initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-        "add (#{product_ids}) @ $#{price_string}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
+        "add (#{product_ids}) @ $#{BuilderHelpers.money(price)}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
       end
 
       def self.from_string(string, options = {:product_class => ProductStub})
@@ -92,7 +93,7 @@ module BillingLogic
                               $1.to_sym
                             end
         opts[:disable]    = !!(string =~ /and disable/)
-        opts[:starts_on]  = (string =~ /on #{BillingLogic::CommandBuilders::DATE_REGEX}/) ? Date.strptime($1, '%m/%d/%y') : (string =~ /now$/) ? Time.now : nil
+        opts[:starts_on]  = (string =~ /on #{BillingLogic::CommandBuilders::DATE_REGEX}/) ? Date.strptime($1, STRFTIME) : (string =~ /now$/) ? Time.now : nil
         opts[:products] = ProductList.parse(string, options)
 
         opts[:profile_id] = case opts[:action]
