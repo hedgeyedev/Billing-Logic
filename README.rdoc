@@ -1,6 +1,3 @@
-= Do Not Use in Production
-This is very alpha state & probably an ill conceived idea
-
 = Billing Logic
 BillingAccount
 Product
