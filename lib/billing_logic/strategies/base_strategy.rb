@@ -71,6 +71,7 @@ module BillingLogic::Strategies
     # each strategy.
     # @return [nil]
     def add_commands_for_products_to_be_added!
+      raise "Called BaseStrategy#add_commands_for_products_to_be_added!"
     end
 
     # this doesn't feel like it should be here
