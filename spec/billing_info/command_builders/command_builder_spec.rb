@@ -38,6 +38,14 @@ describe BillingLogic::CommandBuilders::ActionObject do
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
   end
 
+  it "recognizes a valid command to cancel a product and add a different project" do
+    fake_time = Time.zone.local(2012, 3, 3, 12, 0, 0)
+    Timecop.travel(fake_time)
+    command = "cancel [(A @ $30/mo) @ $30/mo] now, add (B @ $300/yr) @ $300.00/yr now"
+    ap BillingLogic::CommandBuilders::ActionObject.from_string(command)
+    BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
+  end
+
   it "recognizes a valid command to cancel one product and add another in the future" do
     fake_time = Time.zone.local(2012, 3, 3, 12, 0, 0)
     Timecop.travel(fake_time)
