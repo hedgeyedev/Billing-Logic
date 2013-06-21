@@ -14,18 +14,18 @@ There currently 2 strategies available: IndependentPaymentStrategy & SinglePayme
 
 == BillingLogic::PaymentProfile
 A PaymentProfile must have the following fields
-  :id 				# a unique identifier
-  :products 			# An array of products
-  :next_payment_date 		# DateTime of the next due payment
-  :billing_cycle 		# A BillingLogic::BillingCycle
-  :active_or_pending? 		# Is this a current, not cancelled nor suspended profile
-  :last_refundable_payment	# The amount of the last payment that is refundable
+  :id                         # a unique identifier
+  :products                   # An array of products
+  :next_payment_date          # DateTime of the next due payment
+  :billing_cycle              # A BillingLogic::BillingCycle
+  :active_or_pending?         # Is this a current, not cancelled nor suspended profile
+  :last_refundable_payment    # The amount of the last payment that is refundable
 
 == BillingLogic::Product
 A product must provide the following fields
-  :id 		      # a unique identifier
-  :name 	      # a class of product identifier
-  :price 	      # the common price for this object
+  :id                 # a unique identifier
+  :name               # a class of product identifier
+  :price              # the common price for this object
   :billing_cycle      # A Billing Cycle like object
   :payments           # an array of payments made if applicable
   :initial_amount     # The amount of an optional initial payment if applicable
