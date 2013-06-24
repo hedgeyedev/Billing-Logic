@@ -14,22 +14,36 @@ RSpec.configure do |config|
 end
 
 class MockProduct
+
   include BillingLogic::CommandBuilders::BuilderHelpers
 
   attr_accessor :identifier, :name, :price, :billing_cycle, :initial_payment
+
+  # Example:
+  #   MockProduct.new(:identifier => 1,
+  #                   :name => 'A',
+  #                   :price => 10,
+  #                   :billing_cycle => monthly_cycle,
+  #                   :initial_payment => 0.0)
+  
   def initialize(opts ={})
     opts.each do |k, v|
       self.send("#{k}=", v)
     end
   end
 
-  def id
-    "#{@id} @ $#{price}#{periodicity_abbrev(billing_cycle.period)}"
-  end
 end
 
 class MockProfile
   attr_accessor :identifier, :products, :price, :paid_until_date, :billing_cycle, :active_or_pending, :current_products, :active_products
+
+  # Example:
+  #   MockProfile.new(:products => [product_d],
+  #                   :price => 40,
+  #                   :identifier => 'i-4',
+  #                   :paid_until_date => monthly_cycle.next_payment_date,
+  #                   :active_or_pending => false)
+
   def initialize(opts ={})
     opts.each do |k, v|
       self.send("#{k}=", v)

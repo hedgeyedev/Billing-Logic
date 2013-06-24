@@ -27,8 +27,8 @@ A product must provide the following fields
   :name               # a class of product identifier
   :price              # the common price for this object
   :billing_cycle      # A Billing Cycle like object
-  :payments           # an array of payments made if applicable
-  :initial_amount     # The amount of an optional initial payment if applicable
+  :payments           # an array of payments made, if applicable
+  :initial_amount     # The amount of an optional initial payment, if applicable
   :billing_start_date # This will be used for special cases when we don't want to start the billing immediatly
 
   facility methods
@@ -39,16 +39,28 @@ A product must provide the following fields
     expires_on
 
 == BillingLogic::BillingCycle
-fields: 
-  :frequency
-  :period
+constants:
+  TIME_UNITS = { :day => 1, :week => 7, :month => 365/12.0, :semimonth=> 365/24, :year => 365 }
+
+fields:
+  :frequency (1, 45)
+  :period (:day, :week, :semimonth, :month, :year)
   :anniversary
 
-methods
+methods:
   days_in_billing_cycle_including(date)
   next_payment_date
   closest_anniversary_date_including(date)
+  periodicity ( TIME_UNITS[self.period] * frequency )
 
+== BillingLogic::PaymentCommandBuilder
+
+methods:
+  group_products_by_billing_cycle
+
+class methods:
+  create_recurring_payment_commands
+  cancel_recurring_payment_commands
 
 # == Subscription
 # fields:
