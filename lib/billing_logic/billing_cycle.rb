@@ -28,22 +28,31 @@ module BillingLogic
     
     def closest_anniversary_date_including(date) 
       date_in_past = date < anniversary
-      advance_date_by_period(anniversary, date_in_past)
+      increment_date_by_period(anniversary, date_in_past)
     end
 
     def closest_future_anniversary_date_including(date)
-      return anniversary if anniversary > date
-      return advance_date_by_period(anniversary.dup) if anniversary == date
-      next_anniversary = anniversary.dup
-      while(date > next_anniversary) 
-        next_anniversary = advance_date_by_period(next_anniversary)
+      if anniversary == date
+        increment_date_by_period(anniversary.dup)
+      elsif anniversary > date
+        prev_anniversary = anniversary.dup
+        while (date < prev_anniversary)
+          old_prev_anniversary = prev_anniversary
+          prev_anniversary = increment_date_by_period(prev_anniversary, true)
+        end
+        old_prev_anniversary
+      else
+        next_anniversary = anniversary.dup
+        while (date > next_anniversary) 
+          next_anniversary = increment_date_by_period(next_anniversary)
+        end
+        next_anniversary
       end
-      next_anniversary
     end
 
-    def advance_date_by_period(date, revert = false)
-      operators =   {:month => revert ? :<< : :>>, 
-                     :day   => revert ? :-  : :+ }
+    def increment_date_by_period(date, backwards = false)
+      operators =   {:month => backwards ? :<< : :>>, 
+                     :day   => backwards ? :-  : :+ }
       case self.period
       when :year
         date.send(operators[:month], (self.frequency * 12))
