@@ -30,7 +30,9 @@
     
     strategy.command_list => An Array of commands provided by the command builder class
 
-There currently 2 strategies available:
+There are three strategies available:
+- BaseStrategy:
+  - Contains most of the methods
 - IndependentPaymentStrategy:
   - Each product gets its own PaymentProfile
   - Default payment_command_builder_class: BillingLogic::CommandBuilders::WordBuilder
@@ -38,31 +40,13 @@ There currently 2 strategies available:
   - All products share a single PaymentProfile
   - Default payment_command_builder_class: BillingLogic::CommandBuilders::AggregateWordBuilder
 
-== BillingLogic::PaymentProfile
-A PaymentProfile must have the following fields
-  :id                         # a unique identifier
-  :products                   # An array of products
-  :next_payment_date          # DateTime of the next due payment
-  :billing_cycle              # A BillingLogic::BillingCycle
-  :active_or_pending?         # Is this a current, not cancelled nor suspended profile
-  :last_refundable_payment    # The amount of the last payment that is refundable
-
-== BillingLogic::Product
-A product must provide the following fields
-  :id                 # a unique identifier
-  :name               # a class of product identifier
-  :price              # the common price for this object
-  :billing_cycle      # A Billing Cycle like object
-  :payments           # an array of payments made, if applicable
-  :initial_amount     # The amount of an optional initial payment, if applicable
-  :billing_start_date # This will be used for special cases when we don't want to start the billing immediatly
-
-  facility methods
-    renewal_month
-    renewal_day
-    interval
-    start_on
-    expires_on
+BaseStrategy public methods:
+- command_list
+- current_state=(subscriptions)
+- products_to_be_added
+- products_to_be_added_grouped_by_date
+- products_to_be_removed
+- current_products
 
 == BillingLogic::BillingCycle
 constants:
