@@ -25,6 +25,11 @@ describe BillingLogic::CommandBuilders::ActionObject do
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
   end
 
+  it "recognizes a valid command to cancel a product (with parens)" do
+    command = "cancel [(A @ $30/mo) @ $30/mo] now"
+    BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
+  end
+
   it "recognizes a valid command to cancel two products" do
     command = "cancel [A @ $30/mo] now, cancel [B @ $20/mo] now"
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
@@ -33,24 +38,7 @@ describe BillingLogic::CommandBuilders::ActionObject do
   it "recognizes a valid command to add a product on a future date" do
     fake_time = Time.zone.local(2012, 3, 3, 12, 0, 0)
     Timecop.travel(fake_time)
-    command = "cancel [(A @ $30/mo) @ $30/mo] now, add (B @ $300/yr) @ $300.00/yr on 03/10/12"
-    ap BillingLogic::CommandBuilders::ActionObject.from_string(command)
-    BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
-  end
-
-  it "recognizes a valid command to cancel a product and add a different project" do
-    fake_time = Time.zone.local(2012, 3, 3, 12, 0, 0)
-    Timecop.travel(fake_time)
-    command = "cancel [(A @ $30/mo) @ $30/mo] now, add (B @ $300/yr) @ $300.00/yr now"
-    ap BillingLogic::CommandBuilders::ActionObject.from_string(command)
-    BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
-  end
-
-  it "recognizes a valid command to cancel one product and add another in the future" do
-    fake_time = Time.zone.local(2012, 3, 3, 12, 0, 0)
-    Timecop.travel(fake_time)
-    command = "cancel [(A @ $30/mo) @ $30/mo] now, add (B @ $300/yr) @ $300.00/yr on 03/10/12"
-    ap BillingLogic::CommandBuilders::ActionObject.from_string(command)
+    command = "add (B @ $300/yr) @ $300.00/yr on 03/10/12"
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
   end
 

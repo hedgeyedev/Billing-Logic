@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 module BillingLogic
+
+  # an IndependentPaymentStrategy gives each product its own payment_profile
   describe Strategies::IndependentPaymentStrategy do
     module With0RefundablePayment
       def refundable_payment_amount(foo)
