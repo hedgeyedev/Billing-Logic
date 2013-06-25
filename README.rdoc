@@ -23,15 +23,20 @@
     end
 
 == BillingLogic::Strategies
-There currently 2 strategies available:
-- IndependentPaymentStrategy: Each product gets its own PaymentProfile
-- SinglePaymentStrategy: All products share a single PaymentProfile
 
     strategy = <strategy class>.new(:payment_command_builder_class => <your builder class>,
     				:current_state => <an array of payment profiles>
     				:desired_state => <an array of products>)
     
     strategy.command_list => An Array of commands provided by the command builder class
+
+There currently 2 strategies available:
+- IndependentPaymentStrategy:
+  - Each product gets its own PaymentProfile
+  - Default payment_command_builder_class: BillingLogic::CommandBuilders::WordBuilder
+- SinglePaymentStrategy:
+  - All products share a single PaymentProfile
+  - Default payment_command_builder_class: BillingLogic::CommandBuilders::AggregateWordBuilder
 
 == BillingLogic::PaymentProfile
 A PaymentProfile must have the following fields
