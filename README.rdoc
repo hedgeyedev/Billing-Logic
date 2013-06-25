@@ -23,7 +23,9 @@
     end
 
 == BillingLogic::Strategies
-There currently 2 strategies available: IndependentPaymentStrategy & SinglePaymentStrategy
+There currently 2 strategies available:
+- IndependentPaymentStrategy: Each product gets its own PaymentProfile
+- SinglePaymentStrategy: All products share a single PaymentProfile
 
     strategy = <strategy class>.new(:payment_command_builder_class => <your builder class>,
     				:current_state => <an array of payment profiles>
