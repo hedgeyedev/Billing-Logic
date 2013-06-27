@@ -27,8 +27,11 @@ module BillingLogic
     end
     
     def closest_anniversary_date_including(date) 
-      date_in_past = date < anniversary
-      increment_date_by_period(anniversary, date_in_past)
+      if date < anniversary
+        decrement_date_by_period(anniversary)
+      else
+        increment_date_by_period(anniversary)
+      end
     end
 
     def closest_future_anniversary_date_including(date)
@@ -38,7 +41,7 @@ module BillingLogic
         prev_anniversary = anniversary.dup
         while (date < prev_anniversary)
           old_prev_anniversary = prev_anniversary
-          prev_anniversary = increment_date_by_period(prev_anniversary, true)
+          prev_anniversary = decrement_date_by_period(prev_anniversary)
         end
         old_prev_anniversary
       else
@@ -50,7 +53,15 @@ module BillingLogic
       end
     end
 
-    def increment_date_by_period(date, backwards = false)
+    def increment_date_by_period(date)
+      shift_date_by_period(date)
+    end
+
+    def decrement_date_by_period(date)
+      shift_date_by_period(date, true)
+    end
+
+    def shift_date_by_period(date, backwards = false)
       operators =   {:month => backwards ? :<< : :>>, 
                      :day   => backwards ? :-  : :+ }
       case self.period
