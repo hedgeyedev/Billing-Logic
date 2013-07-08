@@ -29,7 +29,7 @@ class MockProduct
 end
 
 class MockProfile
-  attr_accessor :identifier, :products, :price, :paid_until_date, :billing_cycle, :active_or_pending
+  attr_accessor :identifier, :products, :price, :paid_until_date, :billing_cycle, :active_or_pending, :current_products, :active_products
   def initialize(opts ={})
     opts.each do |k, v|
       self.send("#{k}=", v)
@@ -43,5 +43,4 @@ class MockProfile
   def refundable_payment_amount(foo)
     0.0
   end
-
 end
