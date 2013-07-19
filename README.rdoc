@@ -1,13 +1,28 @@
-= Do Not Use in Production
-This is very alpha state & probably an ill conceived idea
-
 = Billing Logic
-BillingAccount
-Product
-Subscription
+- BillingAccount
+- Product
+- Subscription
+
+== Structure
+
+    module BillingLogic
+      module CommandBuilders
+        autoload :BuilderHelpers, 'billing_logic/command_builders/command_builders'
+        autoload :BasicBuilder, 'billing_logic/command_builders/command_builders'
+        autoload :WordBuilder , 'billing_logic/command_builders/command_builders'
+        autoload :AggregateWordBuilder, 'billing_logic/command_builders/command_builders'
+        autoload :ActionObject,         'billing_logic/command_builders/command_builders'
+        autoload :SINGLE_PRODUCT_REGEX, 'billing_logic/command_builders/command_builders'
+
+      end
+      module Strategies
+        autoload :BaseStrategy              , 'billing_logic/strategies/base_strategy'
+        autoload :IndependentPaymentStrategy, 'billing_logic/strategies/independent_payment_strategy'
+        autoload :SinglePaymentStrategy     , 'billing_logic/strategies/single_payment_strategy'
+      end
+    end
 
 == BillingLogic::Strategies
-There currently 2 strategies available: IndependentPaymentStrategy & SinglePaymentStrategy
 
     strategy = <strategy class>.new(:payment_command_builder_class => <your builder class>,
     				:current_state => <an array of payment profiles>
@@ -15,43 +30,47 @@ There currently 2 strategies available: IndependentPaymentStrategy & SinglePayme
     
     strategy.command_list => An Array of commands provided by the command builder class
 
-== BillingLogic::PaymentProfile
-A PaymentProfile must have the following fields
-  :id 				# a unique identifier
-  :products 			# An array of products
-  :next_payment_date 		# DateTime of the next due payment
-  :billing_cycle 		# A BillingLogic::BillingCycle
-  :active_or_pending? 		# Is this a current, not cancelled nor suspended profile
-  :last_refundable_payment	# The amount of the last payment that is refundable
+There are three strategies available:
+- BaseStrategy:
+  - Contains most of the methods
+- IndependentPaymentStrategy:
+  - Each product gets its own PaymentProfile
+  - Default payment_command_builder_class: BillingLogic::CommandBuilders::WordBuilder
+- SinglePaymentStrategy:
+  - All products share a single PaymentProfile
+  - Default payment_command_builder_class: BillingLogic::CommandBuilders::AggregateWordBuilder
 
-== BillingLogic::Product
-A product must provide the following fields
-  :id 		      # a unique identifier
-  :name 	      # a class of product identifier
-  :price 	      # the common price for this object
-  :billing_cycle      # A Billing Cycle like object
-  :payments           # an array of payments made if applicable
-  :initial_amount     # The amount of an optional initial payment if applicable
-  :billing_start_date # This will be used for special cases when we don't want to start the billing immediatly
-
-  facility methods
-    renewal_month
-    renewal_day
-    interval
-    start_on
-    expires_on
+BaseStrategy public methods:
+- command_list
+- current_state=(subscriptions)
+- products_to_be_added
+- products_to_be_added_grouped_by_date
+- products_to_be_removed
+- current_products
 
 == BillingLogic::BillingCycle
-fields: 
-  :frequency
-  :period
+constants:
+  TIME_UNITS = { :day => 1, :week => 7, :month => 365/12.0, :semimonth=> 365/24, :year => 365 }
+
+fields:
+  :frequency (1, 45)
+  :period (:day, :week, :semimonth, :month, :year)
   :anniversary
 
-methods
+methods:
   days_in_billing_cycle_including(date)
   next_payment_date
   closest_anniversary_date_including(date)
+  periodicity ( TIME_UNITS[self.period] * frequency )
 
+== BillingLogic::PaymentCommandBuilder
+
+methods:
+  group_products_by_billing_cycle
+
+class methods:
+  create_recurring_payment_commands
+  cancel_recurring_payment_commands
 
 # == Subscription
 # fields:
