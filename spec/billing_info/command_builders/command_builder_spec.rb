@@ -1,7 +1,4 @@
 require 'spec_helper'
-require 'awesome_print'
-require 'active_support/all'
-require 'timecop'
 
 describe BillingLogic::CommandBuilders::ActionObject do
 
@@ -10,6 +7,7 @@ describe BillingLogic::CommandBuilders::ActionObject do
   end
 
   it "recognizes a valid command to remove products" do
+    # Remove two products from a bundle with one payment_profile
     command = "remove (B @ $20/mo & C @ $20/mo) from [(A @ $30/mo & B @ $20/mo & C @ $20/mo) @ $70/mo] now"
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
   end
@@ -26,18 +24,12 @@ describe BillingLogic::CommandBuilders::ActionObject do
   end
 
   it "recognizes a valid command to cancel a product (with parens)" do
+    # This is considered a bundle within Billing-Logic
     command = "cancel [(A @ $30/mo) @ $30/mo] now"
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
   end
 
-  it "recognizes a valid command to cancel two products" do
-    command = "cancel [A @ $30/mo] now, cancel [B @ $20/mo] now"
-    BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
-  end
-
   it "recognizes a valid command to add a product on a future date" do
-    fake_time = Time.zone.local(2012, 3, 3, 12, 0, 0)
-    Timecop.travel(fake_time)
     command = "add (B @ $300/yr) @ $300.00/yr on 03/10/12"
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
   end
