@@ -6,23 +6,23 @@
 == Structure
 
     module BillingLogic
-      class BillingCycle
-      module CommandBuilders
-        module BuilderHelpers
-        class ProductList
-        class ProductStub
-        class ActionObject
-        class BasicBuilder
-        class WordBuilder < BasicBuilder
-        class AggregateWordBuilder < BasicBuilder
-      class CurrentState
-      module CurrentStateMixin
-      class PaymentCommandBuilder
-      class ProrationCalculator
-      module Strategies
-        class BaseStrategy
-        class IndependentPaymentStrategy
-        class SinglePaymentStrategy
+        class BillingCycle
+        module CommandBuilders
+            module BuilderHelpers
+            class ProductList
+            class ProductStub
+            class ActionObject
+            class BasicBuilder
+            class WordBuilder < BasicBuilder
+            class AggregateWordBuilder < BasicBuilder
+        class CurrentState
+        module CurrentStateMixin
+        class PaymentCommandBuilder
+        class ProrationCalculator
+        module Strategies
+            class BaseStrategy
+            class IndependentPaymentStrategy
+            class SinglePaymentStrategy
 
 == BillingLogic::Strategies
 
