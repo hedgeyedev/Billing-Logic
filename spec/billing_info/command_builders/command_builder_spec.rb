@@ -6,13 +6,13 @@ describe BillingLogic::CommandBuilders::ActionObject do
     Time.zone = "Eastern Time (US & Canada)"
   end
 
-  it "recognizes a valid command to remove products" do
+  it "recognizes a valid command to remove products from a bundle" do
     # Remove two products from a bundle with one payment_profile
     command = "remove (B @ $20/mo & C @ $20/mo) from [(A @ $30/mo & B @ $20/mo & C @ $20/mo) @ $70/mo] now"
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == command
   end
 
-  it "recognizes a valid command to add a product" do
+  it "recognizes a valid command to add two products" do
     command = "add (B @ $20/mo & C @ $20/mo) @ $40.00/mo now"
     translated_command = command.gsub("now", "on ") + Time.zone.now.strftime('%m/%d/%y')
     BillingLogic::CommandBuilders::ActionObject.from_string(command).to_s.should == translated_command
