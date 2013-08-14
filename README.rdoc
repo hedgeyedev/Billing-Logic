@@ -1,7 +1,11 @@
 = Billing Logic
-- BillingAccount
-- Product
-- Subscription
+
+== Major Players
+- *BillingCycle* has a period, frequency, anniversary, time_unit_measure, periodicity, next_payment_date, etc.
+- *CurrentState* holds a set of profiles and can iterate through them or return current_products or active_products
+- *PaymentCommandBuilder*, initialized with an array of products, generates commands for creating recurring payments for those products; also takes a set of profile_ids and generates commands for canceling their recurring payments
+- *Base/IndependentPayment/SinglePaymentStrategy*, initialized with a current state, desired state and builder class, calculates how to achieve the desired state
+- *ProrationCalculator*, initialized with a hash of billing_cycle, price and date, calculates a prorated price
 
 == Structure
 
