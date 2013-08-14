@@ -6,21 +6,23 @@
 == Structure
 
     module BillingLogic
+      class BillingCycle
       module CommandBuilders
-        autoload :BuilderHelpers, 'billing_logic/command_builders/command_builders'
-        autoload :BasicBuilder, 'billing_logic/command_builders/command_builders'
-        autoload :WordBuilder , 'billing_logic/command_builders/command_builders'
-        autoload :AggregateWordBuilder, 'billing_logic/command_builders/command_builders'
-        autoload :ActionObject,         'billing_logic/command_builders/command_builders'
-        autoload :SINGLE_PRODUCT_REGEX, 'billing_logic/command_builders/command_builders'
-
-      end
+        module BuilderHelpers
+        class ProductList
+        class ProductStub
+        class ActionObject
+        class BasicBuilder
+        class WordBuilder < BasicBuilder
+        class AggregateWordBuilder < BasicBuilder
+      class CurrentState
+      module CurrentStateMixin
+      class PaymentCommandBuilder
+      class ProrationCalculator
       module Strategies
-        autoload :BaseStrategy              , 'billing_logic/strategies/base_strategy'
-        autoload :IndependentPaymentStrategy, 'billing_logic/strategies/independent_payment_strategy'
-        autoload :SinglePaymentStrategy     , 'billing_logic/strategies/single_payment_strategy'
-      end
-    end
+        class BaseStrategy
+        class IndependentPaymentStrategy
+        class SinglePaymentStrategy
 
 == BillingLogic::Strategies
 
