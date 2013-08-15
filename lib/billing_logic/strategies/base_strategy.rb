@@ -1,52 +1,102 @@
 require 'forwardable'
+
 module BillingLogic::Strategies
+
+  # The BaseStrategy defines generic functions used by various BillingLogic::Strategies.
+  # @abstract
   class BaseStrategy
 
     attr_accessor :desired_state, :current_state, :payment_command_builder_class, :default_command_builder
 
+    # Defines an initializer for subclasses to use
     def initialize(opts = {})
       @current_state = opts.delete(:current_state) || []
       @desired_state = opts.delete(:desired_state) || []
       @command_list = []
-      @payment_command_builder_class = opts.delete(:payment_command_builder_class) || default_command_builder
+      self.payment_command_builder_class = opts.delete(:payment_command_builder_class)
     end
 
+    # Sets @payment_command_builder_class (or raises exception if attempting to instantiate Strategies::BaseClass)
+    def payment_command_builder_class=(builder_class)
+      if builder_class
+        @payment_command_builder_class = builder_class
+      else
+        raise "BillingLogic::Strategies::BaseClass is an abstract class. Please instantiate a concrete subclass."
+      end
+    end
+
+    # Returns a string representing the commands the Strategy generates
+    #
+    # @return [String] the string representation of the commands the Strategy generates
     def command_list
       calculate_list
       @command_list.flatten
     end
 
-    # Returns a list of products that are not in the current state grouped by
-    # date
+    # Returns an array of BillingEngine::Client::Products to be added, grouped by date
+    #
     # @return [Array]
     def products_to_be_added_grouped_by_date
       group_by_date(products_to_be_added)
     end
 
+    # Returns an array of BillingEngine::Client::Products to be added because they're desired but not active
+    # 
+    # @return [Array<BillingEngine::Client::Product>] array of desired but inactive BillingEngine::Client::Products scheduled to be added
     def products_to_be_added
       desired_state.reject do |product|
         ProductComparator.new(product).in_like?(active_products)
       end
     end
 
+    # Returns an array of BillingEngine::Client::Products to be removed because they're active but not desired
+    # 
+    # @return [Array<BillingEngine::Client::Product>] array of active but no longer desired BillingEngine::Client::Products scheduled for removal
     def products_to_be_removed
       active_products.reject do |product|
         ProductComparator.new(product).included?(desired_state)
       end
     end
 
+    # Returns an array of inactive BillingEngine::Client::Products in the CurrentState
+    #
+    # @return [Array<BillingEngine::Client::Product>] array of inactive BillingEngine::Client::Products in the CurrentState
     def inactive_products
-      profiles_by_status(false).map { |profile| profile.products }.flatten
+      neither_active_nor_pending_profiles.map { |profile| profile.products }.flatten
     end
 
+    # Returns an array of PaymentProfiles with profile_status 'ActiveProfile' or 'PendingProfile'
+    #
+    # @return [Array<PaymentProfile>]
     def active_profiles
-      profiles_by_status(true)
+      active_or_pending_profiles
     end
 
+    # Returns an array of active BillingEngine::Client::Products from the CurrentState
+    #
+    # @return [Array<BillingEngine::Client::Product>] array of active BillingEngine::Client::Products in the CurrentState
     def active_products
       current_state.active_products
     end
 
+    # CurrentState PaymentProfiles with payment_profile of 'ActiveProfile' or 'PendingProfile'
+    #
+    # @return [Array<PaymentProfile>] array of all 'ActiveProfile' or 'PendingProfile' PaymentProfiles
+    #   for the CurrentState
+    def active_or_pending_profiles
+      current_state.reject { |profile| !profile.active_or_pending }
+    end
+
+    # CurrentState PaymentProfiles with payment_profile of neither 'ActiveProfile' nor 'PendingProfile' (i.e., either
+    # 'CancelledProfile' or 'ComplimentaryProfile')
+    #
+    # @return [Array<PaymentProfile>] array of all PaymentProfiles for the CurrentState with payment_profile of neither 
+    # 'ActiveProfile' nor 'PendingProfile'
+    def neither_active_nor_pending_profiles
+      current_state.reject { |profile| profile.active_or_pending }
+    end
+
+    # @deprecated Too confusing. Please call either #active_or_pending_profiles or #neither_active_nor_pending_profiles
     def profiles_by_status(active_or_pending = nil)
       current_state.reject { |profile| !profile.active_or_pending? == active_or_pending}
     end
@@ -105,7 +155,8 @@ module BillingLogic::Strategies
     end
 
     def next_payment_date_from_profile_with_product(product, opts = {:active => false})
-      profiles_by_status(opts[:active]).map do |profile|
+      profiles = opts[:active] ? active_or_pending_profiles : neither_active_nor_pending_profiles
+      profiles.map do |profile|
         profile.paid_until_date if ProductComparator.new(product).in_class_of?(profile.products)
       end.compact.max
     end
