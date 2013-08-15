@@ -3,26 +3,15 @@ require 'forwardable'
 module BillingLogic::Strategies
 
   # The BaseStrategy defines generic functions used by various BillingLogic::Strategies.
-  # @abstract
   class BaseStrategy
 
     attr_accessor :desired_state, :current_state, :payment_command_builder_class, :default_command_builder
 
-    # Defines an initializer for subclasses to use
     def initialize(opts = {})
       @current_state = opts.delete(:current_state) || []
       @desired_state = opts.delete(:desired_state) || []
       @command_list = []
-      self.payment_command_builder_class = opts.delete(:payment_command_builder_class)
-    end
-
-    # Sets @payment_command_builder_class (or raises exception if attempting to instantiate Strategies::BaseClass)
-    def payment_command_builder_class=(builder_class)
-      if builder_class
-        @payment_command_builder_class = builder_class
-      else
-        raise "BillingLogic::Strategies::BaseClass is an abstract class. Please instantiate a concrete subclass."
-      end
+      @payment_command_builder_class = opts.delete(:payment_command_builder_class) || default_command_builder
     end
 
     # Returns a string representing the commands the Strategy generates
@@ -33,9 +22,8 @@ module BillingLogic::Strategies
       @command_list.flatten
     end
 
-    # Returns an array of BillingEngine::Client::Products to be added, grouped by date
+    # Returns BillingEngine::Client::Products to be added, grouped by date
     #
-    # @return [Array]
     def products_to_be_added_grouped_by_date
       group_by_date(products_to_be_added)
     end
@@ -67,7 +55,7 @@ module BillingLogic::Strategies
 
     # Returns an array of PaymentProfiles with profile_status 'ActiveProfile' or 'PendingProfile'
     #
-    # @return [Array<PaymentProfile>]
+    # @return [Array<PaymentProfile>] array of PaymentProfiles in the CurrentState with profile_status 'ActiveProfile' or 'PendingProfile'
     def active_profiles
       active_or_pending_profiles
     end
@@ -155,8 +143,8 @@ module BillingLogic::Strategies
     end
 
     def next_payment_date_from_profile_with_product(product, opts = {:active => false})
-      profiles = opts[:active] ? active_or_pending_profiles : neither_active_nor_pending_profiles
-      profiles.map do |profile|
+      temp_profiles = opts[:active] ? active_or_pending_profiles : neither_active_nor_pending_profiles
+      temp_profiles.map do |profile|
         profile.paid_until_date if ProductComparator.new(product).in_class_of?(profile.products)
       end.compact.max
     end
