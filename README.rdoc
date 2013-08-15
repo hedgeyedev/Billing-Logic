@@ -30,10 +30,14 @@
 
 == BillingLogic::Strategies
 
+You create a BillingLogic::Strategy by passing in a hash with your current state, desired state and builder class:
+
     strategy = <strategy class>.new(:payment_command_builder_class => <your builder class>,
     				:current_state => <an array of payment profiles>
     				:desired_state => <an array of products>)
-    
+
+You then ask the strategy to return you an array of commands:
+
     strategy.command_list => An Array of commands provided by the command builder class
 
 There are three strategies available:
@@ -46,34 +50,36 @@ There are three strategies available:
   - All products share a single PaymentProfile
   - Default payment_command_builder_class: BillingLogic::CommandBuilders::AggregateWordBuilder
 
-BaseStrategy public methods:
-- command_list
-- current_state=(subscriptions)
-- products_to_be_added
-- products_to_be_added_grouped_by_date
-- products_to_be_removed
-- current_products
+BaseStrategy also has these public methods:
+    #command_list
+    #products_to_be_added
+    #products_to_be_added_grouped_by_date
+    #products_to_be_removed
+    #inactive_products
+    #active_products
+    #active_profiles
+    #profiles_by_status(active_or_pending)
 
 == BillingLogic::BillingCycle
 constants:
-  TIME_UNITS = { :day => 1, :week => 7, :month => 365/12.0, :semimonth=> 365/24, :year => 365 }
+    TIME_UNITS = { :day => 1, :week => 7, :month => 365/12.0, :semimonth=> 365/24, :year => 365 }
 
 fields:
-  :frequency (1, 45)
-  :period (:day, :week, :semimonth, :month, :year)
-  :anniversary
+    :frequency (e.g., 1 or 45)
+    :period (e.g., :day, :week, :semimonth, :month, :year)
+    :anniversary (a date)
 
-methods:
-  days_in_billing_cycle_including(date)
-  next_payment_date
-  closest_anniversary_date_including(date)
-  periodicity ( TIME_UNITS[self.period] * frequency )
+methods include:
+    #days_in_billing_cycle_including(date)
+    #next_payment_date
+    #closest_anniversary_date_including(date)
+    #periodicity ( TIME_UNITS[self.period] * frequency )
 
 == BillingLogic::PaymentCommandBuilder
 
-methods:
-  group_products_by_billing_cycle
+instance methods:
+    #group_products_by_billing_cycle
 
 class methods:
-  create_recurring_payment_commands
-  cancel_recurring_payment_commands
+    .create_recurring_payment_commands(products, next_payment_date = Date.current)
+    .cancel_recurring_payment_commands(*profile_ids)
