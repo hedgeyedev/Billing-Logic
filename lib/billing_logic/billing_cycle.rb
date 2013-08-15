@@ -4,12 +4,20 @@ module BillingLogic
     attr_accessor :period, :frequency, :anniversary
     TIME_UNITS = { :day => 1, :week => 7, :month => 365/12.0, :semimonth=> 365/24, :year => 365 }
 
+    # Creates a new BillingCycle instance
+    #
+    # @param opts [Hash] holds :period, :frequency, and :anniversary
+    # @return [BillingCycle] a billing cycle with .period, .frequency and .anniversary
     def initialize(opts = {})
       self.period = opts[:period]
       self.frequency = opts[:frequency] || 1
       self.anniversary = opts[:anniversary]
     end
 
+    # Compares self against another BillingCycle instance by #periodicity
+    #
+    # @param other [BillingCycle] another BillingCycle instance
+    # @return [-1, 0, 1] integer determined by which BillingCycle is longer
     def <=>(other)
       self.periodicity <=> other.periodicity
     end
