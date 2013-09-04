@@ -18,16 +18,16 @@ Feature: Single Payment Strategy
     Given I support a Single Payment Strategy
     And   Today is 3/10/12
     And   I have the following subscriptions:
-    # | billing profile                   | status    | #comments                                                | next billing date   |
+    # | billing profile                                 | status    | #comments                                                | next billing date   |
       | (A @ $30/mo & B @ $20/mo & C @ $20/mo) @ $70/mo | active    | with current permissions and the next billing date is on | 4/1/12              |
     When  I change to having: <desired state>
     Then  I expect the following action: <action>
     Examples: Removing all products
-      | desired state | action               |
+      | desired state | action                                                       |
       | nothing       | cancel [(A @ $30/mo & B @ $20/mo & C @ $20/mo) @ $70/mo] now |
 
     Examples: Removing partial products
-      | desired state             | action                                                                                  |
+      | desired state             | action                                                                                      |
       | A @ $30/mo                | remove (B @ $20/mo & C @ $20/mo) from [(A @ $30/mo & B @ $20/mo & C @ $20/mo) @ $70/mo] now |
       | A @ $30/mo, C @ $20/mo    | remove (B @ $20/mo) from [(A @ $30/mo & B @ $20/mo & C @ $20/mo) @ $70/mo] now              |
 
@@ -41,12 +41,12 @@ Feature: Single Payment Strategy
     Then  I expect the following action: <action>
    Examples: When changing to a lower priced products we want to cancel the current subscription and
              create a new one for the lesser price starting at the end of the previous
-      | desired state | action               |
+      | desired state | action                                                                       |
       | B @ $20/mo    | cancel [(A @ $30/mo) @ $30/mo] now, add (B @ $20/mo) @ $20.00/mo on 03/10/12 |
 
    Examples: When changing to a higher priced products we want to cancel the current subscription and
              create a new one with the first payment prorated for the portion of the month paid
-      | desired state | action               |
+      | desired state | action                                                                       |
       | B @ $40/mo    | cancel [(A @ $30/mo) @ $30/mo] now, add (B @ $40/mo) @ $40.00/mo on 03/10/12 |
 
   Scenario Outline: Changing to a greater periodicity of a current product
@@ -85,7 +85,7 @@ Feature: Single Payment Strategy
     Then  I expect the following action: <action>
    Examples: When changing to a greater periodicity we want to cancel the current profile &
              create a new one crediting the customer for amount paid but unused
-      | desired state | action               |
+      | desired state  | action                                                                         |
       | B @ $300/yr    | cancel [(A @ $30/mo) @ $30/mo] now, add (B @ $300/yr) @ $300.00/yr on 03/10/12 |
 
   Scenario Outline: Changing to a different product with lesser periodicity than the current product
@@ -98,6 +98,6 @@ Feature: Single Payment Strategy
     Then  I expect the following action: <action>
    Examples: When changing to a lesser periodicity we want to cancel the current profile &
              schedule the new one starting at the end to the current payment profile
-      | desired state | action               |
+      | desired state | action                                                                         |
       | B @ $30/mo    | cancel [(A @ $300/yr) @ $300/yr] now, add (B @ $30/mo) @ $30.00/mo on 03/10/12 |
 

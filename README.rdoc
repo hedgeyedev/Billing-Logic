@@ -1,115 +1,86 @@
-= Do Not Use in Production
-This is very alpha state & probably an ill conceived idea
-
 = Billing Logic
-BillingAccount
-Product
-Subscription
+
+== Major Players
+* *BillingCycle* has a period, frequency, anniversary, time_unit_measure, periodicity, next_payment_date, etc.
+* *CurrentState* holds a set of profiles and can iterate through them or return current_products or active_products
+* *PaymentCommandBuilder*, initialized with an array of products, generates commands for creating recurring payments for those products; also takes a set of profile_ids and generates commands for canceling their recurring payments
+* [*Base*|*IndependentPayment*|*SinglePaymentStrategy*], initialized with a current state, desired state and builder class, calculates how to achieve the desired state
+* *ProrationCalculator*, initialized with a hash of billing_cycle, price and date, calculates a prorated price
+* *BillingEngine*::*Client*::*Product*, arrays of these are manipulated via Billing Logic. "Product" in Billing Logic generally refers to BillingEngine::Client::Products
+
+== Structure
+
+    module BillingLogic
+        class BillingCycle
+        module CommandBuilders
+            module BuilderHelpers
+            class ProductList
+            class ProductStub
+            class ActionObject
+            class BasicBuilder
+            class WordBuilder < BasicBuilder
+            class AggregateWordBuilder < BasicBuilder
+        class CurrentState
+        module CurrentStateMixin
+        class PaymentCommandBuilder
+        class ProrationCalculator
+        module Strategies
+            class BaseStrategy
+            class IndependentPaymentStrategy
+            class SinglePaymentStrategy
 
 == BillingLogic::Strategies
-There currently 2 strategies available: IndependentPaymentStrategy & SinglePaymentStrategy
+
+You create a BillingLogic::Strategy by passing in a hash with your current state, desired state and builder class:
 
     strategy = <strategy class>.new(:payment_command_builder_class => <your builder class>,
     				:current_state => <an array of payment profiles>
     				:desired_state => <an array of products>)
-    
+
+You then ask the strategy to return you an array of commands:
+
     strategy.command_list => An Array of commands provided by the command builder class
 
-== BillingLogic::PaymentProfile
-A PaymentProfile must have the following fields
-  :id 				# a unique identifier
-  :products 			# An array of products
-  :next_payment_date 		# DateTime of the next due payment
-  :billing_cycle 		# A BillingLogic::BillingCycle
-  :active_or_pending? 		# Is this a current, not cancelled nor suspended profile
-  :last_refundable_payment	# The amount of the last payment that is refundable
+There are three strategies available:
+- BaseStrategy:
+  - Contains most of the methods
+- IndependentPaymentStrategy:
+  - Each product gets its own PaymentProfile
+  - Default payment_command_builder_class: BillingLogic::CommandBuilders::WordBuilder
+- SinglePaymentStrategy:
+  - All products share a single PaymentProfile
+  - Default payment_command_builder_class: BillingLogic::CommandBuilders::AggregateWordBuilder
 
-== BillingLogic::Product
-A product must provide the following fields
-  :id 		      # a unique identifier
-  :name 	      # a class of product identifier
-  :price 	      # the common price for this object
-  :billing_cycle      # A Billing Cycle like object
-  :payments           # an array of payments made if applicable
-  :initial_amount     # The amount of an optional initial payment if applicable
-  :billing_start_date # This will be used for special cases when we don't want to start the billing immediatly
-
-  facility methods
-    renewal_month
-    renewal_day
-    interval
-    start_on
-    expires_on
+BaseStrategy also has these public methods:
+    #command_list
+    #products_to_be_added
+    #products_to_be_added_grouped_by_date
+    #products_to_be_removed
+    #inactive_products
+    #active_products
+    #active_profiles
+    #profiles_by_status(active_or_pending)
 
 == BillingLogic::BillingCycle
-fields: 
-  :frequency
-  :period
-  :anniversary
+constants:
+    TIME_UNITS = { :day => 1, :week => 7, :month => 365/12.0, :semimonth=> 365/24, :year => 365 }
 
-methods
-  days_in_billing_cycle_including(date)
-  next_payment_date
-  closest_anniversary_date_including(date)
+fields:
+    :frequency (e.g., 1 or 45)
+    :period (e.g., :day, :week, :semimonth, :month, :year)
+    :anniversary (a date)
 
+methods include:
+    #days_in_billing_cycle_including(date)
+    #next_payment_date
+    #closest_anniversary_date_including(date)
+    #periodicity ( TIME_UNITS[self.period] * frequency )
 
-# == Subscription
-# fields:
-#   balance
-#   plan_id
-#   price
-#   status
-#   trial_duration
-#   trial_duration_unit
-#   trial_period
-# 
-# Class methods
-#   new
-#   create
-#   update
-#   cancel
-#   find
-# 
-# 
-# subscription = Subscription#new or Subscription#create
-# subscription.renew
-# subscription.cancel
-# subscription.activate!
-# subscription.deactivate!
-# subscription.status #=> pending, active, expired, cancelled, past_due
-# subscription.balance
-# 
-# Subscription.cancel(id)
-# 
-# == Product
-# product = Product.new
-# product.amount = 19.00
-# 
-# == Plan
-# fields:
-#   plan id
-#   plan name
-#   description
-#   trial period => true/false
-#   billing day of month
-#   number of billing cycles
-#   amount
-#   currency
-#   billing cycle
-# 
-# 
-# == Addons/Discounts
-# id
-# name
-# descripion
-# amount
-# duration
-# number_of_billing_cycles
-# quantity
-# never_expires
-# 
-# == 
-# 
-# 
-# 
-# 
+== BillingLogic::PaymentCommandBuilder
+
+instance methods:
+    #group_products_by_billing_cycle
+
+class methods:
+    .create_recurring_payment_commands(products, next_payment_date = Date.current)
+    .cancel_recurring_payment_commands(*profile_ids)
