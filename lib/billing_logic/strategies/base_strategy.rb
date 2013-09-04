@@ -50,14 +50,14 @@ module BillingLogic::Strategies
     #
     # @return [Array<BillingEngine::Client::Product>] array of inactive BillingEngine::Client::Products in the CurrentState
     def inactive_products
-      neither_active_nor_pending_profiles.map { |profile| profile.products }.flatten
+      profiles_by_status(false).map { |profile| profile.products }.flatten
     end
 
     # Returns an array of PaymentProfiles with profile_status 'ActiveProfile' or 'PendingProfile'
     #
     # @return [Array<PaymentProfile>] array of PaymentProfiles in the CurrentState with profile_status 'ActiveProfile' or 'PendingProfile'
     def active_profiles
-      active_or_pending_profiles
+      profiles_by_status(true)
     end
 
     # Returns an array of active BillingEngine::Client::Products from the CurrentState
@@ -65,23 +65,6 @@ module BillingLogic::Strategies
     # @return [Array<BillingEngine::Client::Product>] array of active BillingEngine::Client::Products in the CurrentState
     def active_products
       current_state.active_products
-    end
-
-    # CurrentState PaymentProfiles with payment_profile of 'ActiveProfile' or 'PendingProfile'
-    #
-    # @return [Array<PaymentProfile>] array of all 'ActiveProfile' or 'PendingProfile' PaymentProfiles
-    #   for the CurrentState
-    def active_or_pending_profiles
-      current_state.reject { |profile| !profile.active_or_pending }
-    end
-
-    # CurrentState PaymentProfiles with payment_profile of neither 'ActiveProfile' nor 'PendingProfile' (i.e., either
-    # 'CancelledProfile' or 'ComplimentaryProfile')
-    #
-    # @return [Array<PaymentProfile>] array of all PaymentProfiles for the CurrentState with payment_profile of neither 
-    # 'ActiveProfile' nor 'PendingProfile'
-    def neither_active_nor_pending_profiles
-      current_state.reject { |profile| profile.active_or_pending }
     end
 
     # @deprecated Too confusing. Please call either #active_or_pending_profiles or #neither_active_nor_pending_profiles
@@ -142,8 +125,7 @@ module BillingLogic::Strategies
     end
 
     def next_payment_date_from_profile_with_product(product, opts = {:active => false})
-      temp_profiles = opts[:active] ? active_or_pending_profiles : neither_active_nor_pending_profiles
-      temp_profiles.map do |profile|
+      profiles_by_status(opts[:active]).map do |profile|
         profile.paid_until_date if ProductComparator.new(product).in_class_of?(profile.products)
       end.compact.max
     end
