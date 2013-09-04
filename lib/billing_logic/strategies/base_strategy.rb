@@ -1,5 +1,8 @@
 require 'forwardable'
+
 module BillingLogic::Strategies
+
+  # The BaseStrategy defines generic functions used by various BillingLogic::Strategies.
   class BaseStrategy
 
     attr_accessor :desired_state, :current_state, :payment_command_builder_class, :default_command_builder
@@ -11,38 +14,55 @@ module BillingLogic::Strategies
       @payment_command_builder_class = opts.delete(:payment_command_builder_class) || default_command_builder
     end
 
+    # Returns a string representing the commands the Strategy generates
+    #
+    # @return [String] the string representation of the commands the Strategy generates
     def command_list
       calculate_list
       @command_list.flatten
     end
 
-    # Returns a list of products that are not in the current state grouped by
-    # date
-    # @return [Array]
+    # Returns BillingEngine::Client::Products to be added, grouped by date
+    #
     def products_to_be_added_grouped_by_date
       group_by_date(products_to_be_added)
     end
 
+    # Returns an array of BillingEngine::Client::Products to be added because they're desired but not active
+    # 
+    # @return [Array<BillingEngine::Client::Product>] array of desired but inactive BillingEngine::Client::Products scheduled to be added
     def products_to_be_added
       desired_state.reject do |product|
         ProductComparator.new(product).in_like?(active_products)
       end
     end
 
+    # Returns an array of BillingEngine::Client::Products to be removed because they're active but not desired
+    # 
+    # @return [Array<BillingEngine::Client::Product>] array of active but no longer desired BillingEngine::Client::Products scheduled for removal
     def products_to_be_removed
       active_products.reject do |product|
         ProductComparator.new(product).included?(desired_state)
       end
     end
 
+    # Returns an array of inactive BillingEngine::Client::Products in the CurrentState
+    #
+    # @return [Array<BillingEngine::Client::Product>] array of inactive BillingEngine::Client::Products in the CurrentState
     def inactive_products
       profiles_by_status(false).map { |profile| profile.products }.flatten
     end
 
+    # Returns an array of PaymentProfiles with profile_status 'ActiveProfile' or 'PendingProfile'
+    #
+    # @return [Array<PaymentProfile>] array of PaymentProfiles in the CurrentState with profile_status 'ActiveProfile' or 'PendingProfile'
     def active_profiles
       profiles_by_status(true)
     end
 
+    # Returns an array of active BillingEngine::Client::Products from the CurrentState
+    #
+    # @return [Array<BillingEngine::Client::Product>] array of active BillingEngine::Client::Products in the CurrentState
     def active_products
       current_state.active_products
     end
