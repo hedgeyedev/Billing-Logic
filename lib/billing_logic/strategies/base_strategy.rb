@@ -67,7 +67,6 @@ module BillingLogic::Strategies
       current_state.active_products
     end
 
-    # @deprecated Too confusing. Please call either #active_or_pending_profiles or #neither_active_nor_pending_profiles
     def profiles_by_status(active_or_pending = nil)
       current_state.reject { |profile| !profile.active_or_pending? == active_or_pending}
     end
