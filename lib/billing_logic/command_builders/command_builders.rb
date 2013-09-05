@@ -41,7 +41,7 @@ module BillingLogic
     end
 
     class ActionObject
-      STRFTIME = '%m/%d/%y'
+      DATE_FORMAT = '%m/%d/%y'
 
       attr_accessor :action, :products, :profile_id, :initial_payment, :disable, :refund, :starts_on
 
@@ -73,7 +73,7 @@ module BillingLogic
       def add_action_string
         products.map do |product|
           initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-          "add (#{product.identifier}) on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
+          "add (#{product.identifier}) on #{starts_on.strftime(DATE_FORMAT)}#{initial_payment_string}"
         end.to_s
       end
 
@@ -81,7 +81,7 @@ module BillingLogic
         product_ids = products.map { |product| product.identifier }.join(' & ')
         price ||= products.inject(0){ |k, product| k += product.price; k }
         initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-        "add (#{product_ids}) @ $#{BuilderHelpers.money(price)}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime(STRFTIME)}#{initial_payment_string}"
+        "add (#{product_ids}) @ $#{BuilderHelpers.money(price)}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime(DATE_FORMAT)}#{initial_payment_string}"
       end
 
       def self.from_string(string, options = {:product_class => ProductStub})
@@ -93,7 +93,7 @@ module BillingLogic
                               $1.to_sym
                             end
         opts[:disable]    = !!(string =~ /and disable/)
-        opts[:starts_on]  = (string =~ /on #{BillingLogic::CommandBuilders::DATE_REGEX}/) ? Date.strptime($1, STRFTIME) : (string =~ /now$/) ? Time.now : nil
+        opts[:starts_on]  = (string =~ /on #{BillingLogic::CommandBuilders::DATE_REGEX}/) ? Date.strptime($1, DATE_FORMAT) : (string =~ /now$/) ? Time.now : nil
         opts[:products] = ProductList.parse(string, options)
 
         opts[:profile_id] = case opts[:action]
