@@ -84,9 +84,9 @@ module BillingLogic::Strategies
       current_state.reject { |profile| profile.active_or_pending? }
     end
 
-    # @deprecated Too confusing. Please call either #active_or_pending_profiles or #neither_active_nor_pending_profiles
+    # @deprecated Too confusing. Please directly call #active_or_pending_profiles or #neither_active_nor_pending_profiles
     def profiles_by_status(active_or_pending = nil)
-      current_state.reject { |profile| !profile.active_or_pending? == active_or_pending}
+      active_or_pending ? active_or_pending_profiles : neither_active_nor_pending_profiles
     end
 
     protected
@@ -143,8 +143,7 @@ module BillingLogic::Strategies
     end
 
     def next_payment_date_from_profile_with_product(product, opts = {:active => false})
-      temp_profiles = opts[:active] ? active_or_pending_profiles : neither_active_nor_pending_profiles
-      temp_profiles.map do |profile|
+      (opts[:active] ? active_or_pending_profiles : neither_active_nor_pending_profiles).map do |profile|
         profile.paid_until_date if ProductComparator.new(product).in_class_of?(profile.products)
       end.compact.max
     end
