@@ -27,4 +27,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency('guard-rspec', '~> 2.4')
   s.add_development_dependency('guard-cucumber', '~> 1.3')
   s.add_development_dependency('awesome_print')
+  s.add_development_dependency('yard')
 end
