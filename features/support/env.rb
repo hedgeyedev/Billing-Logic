@@ -1,7 +1,6 @@
 require 'cucumber/rspec/doubles'
 require 'timecop'
 require 'ostruct'
-require 'awesome_print'
 
 require_relative './helpers.rb'
 require_relative '../../lib/billing_logic.rb'
