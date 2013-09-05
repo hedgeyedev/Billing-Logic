@@ -50,7 +50,6 @@ module BillingLogic::Strategies
     #
     # @return [Array<BillingEngine::Client::Product>] array of inactive BillingEngine::Client::Products in the CurrentState
     def inactive_products
-      #profiles_by_status(false).map { |profile| profile.products }.flatten
       neither_active_nor_pending_profiles.map { |profile| profile.products }.flatten
     end
 
@@ -58,8 +57,7 @@ module BillingLogic::Strategies
     #
     # @return [Array<PaymentProfile>] array of PaymentProfiles in the CurrentState with profile_status 'ActiveProfile' or 'PendingProfile'
     def active_profiles
-      profiles_by_status(true)
-      #active_or_pending_profiles
+      active_or_pending_profiles
     end
 
     # Returns an array of active BillingEngine::Client::Products from the CurrentState
@@ -74,7 +72,7 @@ module BillingLogic::Strategies
     # @return [Array<PaymentProfile>] array of all 'ActiveProfile' or 'PendingProfile' PaymentProfiles
     #   for the CurrentState
     def active_or_pending_profiles
-      current_state.reject { |profile| !profile.active_or_pending }
+      current_state.reject { |profile| !profile.active_or_pending? }
     end
 
     # CurrentState PaymentProfiles with payment_profile of neither 'ActiveProfile' nor 'PendingProfile' (i.e., either
@@ -83,7 +81,7 @@ module BillingLogic::Strategies
     # @return [Array<PaymentProfile>] array of all PaymentProfiles for the CurrentState with payment_profile of neither 
     # 'ActiveProfile' nor 'PendingProfile'
     def neither_active_nor_pending_profiles
-      current_state.reject { |profile| profile.active_or_pending }
+      current_state.reject { |profile| profile.active_or_pending? }
     end
 
     # @deprecated Too confusing. Please call either #active_or_pending_profiles or #neither_active_nor_pending_profiles
