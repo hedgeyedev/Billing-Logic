@@ -1,4 +1,7 @@
 Then /^(?:|I )(#{ASSERTION})expect the following action: ((?:remove|add|cancel|disable|refund \$\d+ to) .*)$/ do |assertion, commands|
+  puts "---------------------"
+  ap commands
+  puts "---------------------"
   commands.split(/, /).each do |command|
     command_list_should_include(command, assertion)
   end
