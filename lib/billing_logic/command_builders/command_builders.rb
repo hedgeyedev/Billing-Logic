@@ -11,6 +11,8 @@ module BillingLogic
     end
 
     class ProductList
+      # ProductList.parse returns a dumb array
+      # You can't add behavior (I tried adding #price)
       def self.parse(string, options = {})
         if (products = (string =~ /\(([^\(\)]*)\)/) ? $1 : nil)
           products.split(/ & /).map do |product_string|
@@ -39,6 +41,8 @@ module BillingLogic
     end
 
     class ActionObject
+      DATE_FORMAT = '%m/%d/%y'
+
       attr_accessor :action, :products, :profile_id, :initial_payment, :disable, :refund, :starts_on
 
       def initialize(opts = {})
@@ -53,23 +57,31 @@ module BillingLogic
       end
 
       def to_s
-        case action
-        when :cancel
-          "cancel #{'and disable ' if disable}[#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
-        when :remove
-          "remove (#{products.map { |product| product.identifier }.join(" & ")}) from [#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
-        when :add
-          products.map do |product|
-            initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-            "add (#{product.identifier}) on #{starts_on.strftime('%m/%d/%y')}#{initial_payment_string}"
-          end.to_s
-        when :add_bundle
-          product_ids = products.map { |product| product.identifier }.join(' & ')
-          price ||= products.inject(0){ |k, product| k += product.price; k }
-          price_string = BuilderHelpers.money(price)
-          initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
-          "add (#{product_ids}) @ $#{price_string}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime('%m/%d/%y')}#{initial_payment_string}"
+        if [:cancel, :remove, :add, :add_bundle].include?(action)
+          send("#{action.to_s}_action_string")
         end
+      end
+
+      def cancel_action_string
+        "cancel #{'and disable ' if disable}[#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
+      end
+
+      def remove_action_string
+        "remove (#{products.map { |product| product.identifier }.join(" & ")}) from [#{profile_id}] #{"with refund $#{BuilderHelpers.money(refund)} " if refund}now"
+      end
+
+      def add_action_string
+        products.map do |product|
+          initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
+          "add (#{product.identifier}) on #{starts_on.strftime(DATE_FORMAT)}#{initial_payment_string}"
+        end.to_s
+      end
+
+      def add_bundle_action_string
+        product_ids = products.map { |product| product.identifier }.join(' & ')
+        price ||= products.inject(0){ |k, product| k += product.price; k }
+        initial_payment_string = total_initial_payment.zero? ? '' : " with initial payment set to $#{BuilderHelpers.money(total_initial_payment)}"
+        "add (#{product_ids}) @ $#{BuilderHelpers.money(price)}#{periodicity_abbrev(products.first.billing_cycle.period)} on #{starts_on.strftime(DATE_FORMAT)}#{initial_payment_string}"
       end
 
       def self.from_string(string, options = {:product_class => ProductStub})
@@ -81,7 +93,7 @@ module BillingLogic
                               $1.to_sym
                             end
         opts[:disable]    = !!(string =~ /and disable/)
-        opts[:starts_on]  = (string =~ /on #{BillingLogic::CommandBuilders::DATE_REGEX}/) ? Date.strptime($1, '%m/%d/%y') : (string =~ /now$/) ? Time.now : nil
+        opts[:starts_on]  = (string =~ /on #{BillingLogic::CommandBuilders::DATE_REGEX}/) ? Date.strptime($1, DATE_FORMAT) : (string =~ /now$/) ? Time.now : nil
         opts[:products] = ProductList.parse(string, options)
 
         opts[:profile_id] = case opts[:action]
