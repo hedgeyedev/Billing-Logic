@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 module BillingLogic
+
+  # an IndependentPaymentStrategy gives each product its own payment_profile
   describe Strategies::IndependentPaymentStrategy do
     module With0RefundablePayment
       def refundable_payment_amount(foo)
@@ -102,7 +104,6 @@ module BillingLogic
       context 'with an empty desired state' do
         it 'should return an empty command list' do
           strategy.command_list.should == []
-          strategy.command_list.should be_empty
         end
       end
 
