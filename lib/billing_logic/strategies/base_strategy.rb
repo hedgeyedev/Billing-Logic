@@ -50,14 +50,14 @@ module BillingLogic::Strategies
     #
     # @return [Array<BillingEngine::Client::Product>] array of inactive BillingEngine::Client::Products in the CurrentState
     def inactive_products
-      profiles_by_status(false).map { |profile| profile.products }.flatten
+      neither_active_nor_pending_profiles.map { |profile| profile.products }.flatten
     end
 
     # Returns an array of PaymentProfiles with profile_status 'ActiveProfile' or 'PendingProfile'
     #
     # @return [Array<PaymentProfile>] array of PaymentProfiles in the CurrentState with profile_status 'ActiveProfile' or 'PendingProfile'
     def active_profiles
-      profiles_by_status(true)
+      active_or_pending_profiles
     end
 
     # Returns an array of active BillingEngine::Client::Products from the CurrentState
@@ -67,8 +67,26 @@ module BillingLogic::Strategies
       current_state.active_products
     end
 
+    # CurrentState PaymentProfiles with payment_profile of 'ActiveProfile' or 'PendingProfile'
+    #
+    # @return [Array<PaymentProfile>] array of all 'ActiveProfile' or 'PendingProfile' PaymentProfiles
+    #   for the CurrentState
+    def active_or_pending_profiles
+      current_state.reject { |profile| !profile.active_or_pending? }
+    end
+
+    # CurrentState PaymentProfiles with payment_profile of neither 'ActiveProfile' nor 'PendingProfile' (i.e., either
+    # 'CancelledProfile' or 'ComplimentaryProfile')
+    #
+    # @return [Array<PaymentProfile>] array of all PaymentProfiles for the CurrentState with payment_profile of neither 
+    # 'ActiveProfile' nor 'PendingProfile'
+    def neither_active_nor_pending_profiles
+      current_state.reject { |profile| profile.active_or_pending? }
+    end
+
+    # @deprecated Too confusing. Please directly call #active_or_pending_profiles or #neither_active_nor_pending_profiles
     def profiles_by_status(active_or_pending = nil)
-      current_state.reject { |profile| !profile.active_or_pending? == active_or_pending}
+      active_or_pending ? active_or_pending_profiles : neither_active_nor_pending_profiles
     end
 
     protected
@@ -91,6 +109,7 @@ module BillingLogic::Strategies
     # each strategy.
     # @return [nil]
     def add_commands_for_products_to_be_added!
+      raise "Called BaseStrategy#add_commands_for_products_to_be_added!"
     end
 
     # this doesn't feel like it should be here
@@ -124,7 +143,7 @@ module BillingLogic::Strategies
     end
 
     def next_payment_date_from_profile_with_product(product, opts = {:active => false})
-      profiles_by_status(opts[:active]).map do |profile|
+      (opts[:active] ? active_or_pending_profiles : neither_active_nor_pending_profiles).map do |profile|
         profile.paid_until_date if ProductComparator.new(product).in_class_of?(profile.products)
       end.compact.max
     end
