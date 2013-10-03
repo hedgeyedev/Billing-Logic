@@ -43,7 +43,7 @@ module BillingLogic
     class ActionObject
       DATE_FORMAT = '%m/%d/%y'
 
-      attr_accessor :action, :products, :profile_id, :initial_payment, :disable, :refund, :starts_on
+      attr_accessor :action, :products, :profile_id, :initial_payment, :disable, :refund, :starts_on, :price
 
       def initialize(opts = {})
         @action           = opts[:action]
@@ -110,7 +110,7 @@ module BillingLogic
       def total_initial_payment
         @initial_payment ||= products.map { |product| product.initial_payment || 0 }.reduce(0) { |a, e| a + e }
       end
-      
+
       protected
       def periodicity_abbrev(period)
         case period
