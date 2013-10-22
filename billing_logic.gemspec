@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("rspec", '~> 2.12')
   s.add_development_dependency('rake', '~> 10.0')
   s.add_development_dependency('cucumber', '~> 1.2')
-  s.add_development_dependency('timecop', '~> 0.5')
+  s.add_development_dependency('timecop', '~> 0.6')
   s.add_development_dependency('guard', '~> 1.6')
   s.add_development_dependency('guard-rspec', '~> 2.4')
   s.add_development_dependency('guard-cucumber', '~> 1.3')
