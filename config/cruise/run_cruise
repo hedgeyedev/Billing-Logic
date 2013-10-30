@@ -1,5 +1,6 @@
 #!/bin/bash -li
 set -o errexit
+echo The path to the Hedgeye Utilities is $HEDGEYE_UTILITIES_PATH
 source $HEDGEYE_UTILITIES_PATH/set_up_rvm
 mkdir -p temp/pids
 git checkout master
