@@ -42,6 +42,7 @@ You then ask the strategy to return you an array of commands:
     strategy.command_list => An Array of commands provided by the command builder class
 
 There are three strategies available:
+
 - BaseStrategy:
   - Contains most of the methods
 - IndependentPaymentStrategy:
