@@ -29,6 +29,7 @@
             class IndependentPaymentStrategy
             class SinglePaymentStrategy
 
+
 == BillingLogic::Strategies
 
 You create a BillingLogic::Strategy by passing in a hash with your current state, desired state and builder class:
