@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
-  s.add_dependency("activesupport", '~> 3.2')
+  s.add_dependency("activesupport", '~> 4.0.0')
 
   # because activesupport forgot to require tzinfo
   # see https://github.com/rails/rails/issues/4909
