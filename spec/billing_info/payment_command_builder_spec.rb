@@ -12,9 +12,9 @@ module BillingLogic
                        :frequency => 1,
                        :anniversary => Date.current - 7)
     end
-    let(:product_a) { mock('Product A', :name => 'A', :price => 10, :billing_cycle => monthly_cycle) }
-    let(:product_b) { mock('Product B', :name => 'B', :price => 10, :billing_cycle => monthly_cycle) }
-    let(:yearly_product) { mock('Product Yearly', :name => 'Yearly', :price => 10, :billing_cycle => yearly_cycle) }
+    let(:product_a) { double('Product A', :name => 'A', :price => 10, :billing_cycle => monthly_cycle) }
+    let(:product_b) { double('Product B', :name => 'B', :price => 10, :billing_cycle => monthly_cycle) }
+    let(:yearly_product) { double('Product Yearly', :name => 'Yearly', :price => 10, :billing_cycle => yearly_cycle) }
 
     describe "#group_products_by_billing_cycle" do
       context "when 1 billing cycle is present" do
