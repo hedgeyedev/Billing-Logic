@@ -5,7 +5,7 @@ Then /^(?:|I )(#{ASSERTION})expect the following action: ((?:remove|add|cancel|d
 end
 
 Given /^I don't have any subscriptions$/ do
-  # Do Nothing
+  strategy.current_state = BillingLogic::CurrentState.new([])
 end
 
 Given /^Today is (\d+\/\d+\/\d+)$/ do |date|

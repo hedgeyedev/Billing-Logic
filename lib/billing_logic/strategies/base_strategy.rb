@@ -1,46 +1,92 @@
 require 'forwardable'
+
 module BillingLogic::Strategies
+
+  # The BaseStrategy defines generic functions used by various BillingLogic::Strategies.
   class BaseStrategy
 
     attr_accessor :desired_state, :current_state, :payment_command_builder_class, :default_command_builder
 
     def initialize(opts = {})
-      self.current_state = opts.delete(:current_state) || []
+      @current_state = opts.delete(:current_state) || []
       @desired_state = opts.delete(:desired_state) || []
       @command_list = []
       @payment_command_builder_class = opts.delete(:payment_command_builder_class) || default_command_builder
     end
 
+    # Returns a string representing the commands the Strategy generates
+    #
+    # @return [String] the string representation of the commands the Strategy generates
     def command_list
       calculate_list
       @command_list.flatten
     end
 
-    def current_state=(subscriptions)
-      @current_state = removed_obsolete_subscriptions(subscriptions)
-    end
-
-    # Returns a list of products that are not in the current state grouped by
-    # date
-    # @return [Array]
+    # Returns BillingEngine::Client::Products to be added, grouped by date
+    #
     def products_to_be_added_grouped_by_date
       group_by_date(products_to_be_added)
     end
 
+    # Returns an array of BillingEngine::Client::Products to be added because they're desired but not active
+    # 
+    # @return [Array<BillingEngine::Client::Product>] array of desired but inactive BillingEngine::Client::Products scheduled to be added
     def products_to_be_added
       desired_state.reject do |product|
-        ProductComparator.new(product).in_like?(current_active_or_pending_products)
+        ProductComparator.new(product).in_like?(active_products)
       end
     end
 
+    # Returns an array of BillingEngine::Client::Products to be removed because they're active but not desired
+    # 
+    # @return [Array<BillingEngine::Client::Product>] array of active but no longer desired BillingEngine::Client::Products scheduled for removal
     def products_to_be_removed
-      current_active_or_pending_products.reject do |product|
+      active_products.reject do |product|
         ProductComparator.new(product).included?(desired_state)
       end
     end
 
-    def current_products(opts = {})
-      profiles_by_status(opts[:active]).map { |profile| profile.products }.flatten
+    # Returns an array of inactive BillingEngine::Client::Products in the CurrentState
+    #
+    # @return [Array<BillingEngine::Client::Product>] array of inactive BillingEngine::Client::Products in the CurrentState
+    def inactive_products
+      neither_active_nor_pending_profiles.map { |profile| profile.products }.flatten
+    end
+
+    # Returns an array of PaymentProfiles with profile_status 'ActiveProfile' or 'PendingProfile'
+    #
+    # @return [Array<PaymentProfile>] array of PaymentProfiles in the CurrentState with profile_status 'ActiveProfile' or 'PendingProfile'
+    def active_profiles
+      active_or_pending_profiles
+    end
+
+    # Returns an array of active BillingEngine::Client::Products from the CurrentState
+    #
+    # @return [Array<BillingEngine::Client::Product>] array of active BillingEngine::Client::Products in the CurrentState
+    def active_products
+      current_state.active_products
+    end
+
+    # CurrentState PaymentProfiles with payment_profile of 'ActiveProfile' or 'PendingProfile'
+    #
+    # @return [Array<PaymentProfile>] array of all 'ActiveProfile' or 'PendingProfile' PaymentProfiles
+    #   for the CurrentState
+    def active_or_pending_profiles
+      current_state.reject { |profile| !profile.active_or_pending? }
+    end
+
+    # CurrentState PaymentProfiles with payment_profile of neither 'ActiveProfile' nor 'PendingProfile' (i.e., either
+    # 'CancelledProfile' or 'ComplimentaryProfile')
+    #
+    # @return [Array<PaymentProfile>] array of all PaymentProfiles for the CurrentState with payment_profile of neither 
+    # 'ActiveProfile' nor 'PendingProfile'
+    def neither_active_nor_pending_profiles
+      current_state.reject { |profile| profile.active_or_pending? }
+    end
+
+    # @deprecated Too confusing. Please directly call #active_or_pending_profiles or #neither_active_nor_pending_profiles
+    def profiles_by_status(active_or_pending = nil)
+      active_or_pending ? active_or_pending_profiles : neither_active_nor_pending_profiles
     end
 
     protected
@@ -63,40 +109,41 @@ module BillingLogic::Strategies
     # each strategy.
     # @return [nil]
     def add_commands_for_products_to_be_added!
+      raise "Called BaseStrategy#add_commands_for_products_to_be_added!"
     end
 
     # this doesn't feel like it should be here
     def group_by_date(new_products)
       group = {}
       new_products.each do |product|
+        date = nil
         if previously_cancelled_product?(product)
           date = next_payment_date_from_profile_with_product(product, :active => false)
         elsif (previous_product = changed_product_subscription?(product))
           update_product_billing_cycle_and_payment!(product, previous_product)
           date = next_payment_date_from_product(product, previous_product)
-        else
-          date = today
         end
+        date = (date.nil? || date < today) ? today : date
         group[date] ||= []
         group[date] << product
       end
-      group.map { |k, v| [v, k] } 
+      group.map { |k, v| [v, k] }
     end
 
     def previously_cancelled_product?(product)
-      inactive_products.detect do |inactive_product| 
-        ProductComparator.new(inactive_product).same_class?(product) 
+      inactive_products.detect do |inactive_product|
+        ProductComparator.new(inactive_product).same_class?(product)
       end
     end
 
     def changed_product_subscription?(product)
       products_to_be_removed.detect do |removed_product|
-        ProductComparator.new(removed_product).same_class?(product) 
+        ProductComparator.new(removed_product).same_class?(product)
       end
     end
 
     def next_payment_date_from_profile_with_product(product, opts = {:active => false})
-      profiles_by_status(opts[:active]).map do |profile|
+      (opts[:active] ? active_or_pending_profiles : neither_active_nor_pending_profiles).map do |profile|
         profile.paid_until_date if ProductComparator.new(product).in_class_of?(profile.products)
       end.compact.max
     end
@@ -112,7 +159,7 @@ module BillingLogic::Strategies
       if product.billing_cycle.periodicity > previous_product.billing_cycle.periodicity
         product.billing_cycle.next_payment_date
       else
-        product.billing_cycle.anniversary = next_payment_date_from_profile_with_product(product, :active => true) 
+        product.billing_cycle.anniversary = next_payment_date_from_profile_with_product(product, :active => true)
       end
     end
 
@@ -122,25 +169,13 @@ module BillingLogic::Strategies
     end
 
     public
-    def profiles_by_status(active_or_pending = nil)
-      current_state.reject { |profile| !profile.active_or_pending? == active_or_pending}
-    end
-
-    def inactive_products
-      current_products(:active => false)
-    end
-
-    def current_active_or_pending_products
-      current_products(:active => true)
-    end
-
     # this should be part of a separate strategy object
     def add_commands_for_products_to_be_removed!
-      current_state.each do |profile|
+      active_profiles.each do |profile|
 
         # We need to issue refunds before cancelling profiles
         refund_options = issue_refunds_if_necessary(profile)
-        remaining_products = remove_products_from_profile(profile)
+        remaining_products = remaining_products_after_product_removal_from_profile(profile)
 
         if remaining_products.empty? # all products in payment profile needs to be removed
 
@@ -160,7 +195,7 @@ module BillingLogic::Strategies
           else
 
             @command_list << cancel_recurring_payment_command(profile, refund_options)
-            @command_list << create_recurring_payment_command(remaining_products, 
+            @command_list << create_recurring_payment_command(remaining_products,
                                                               :paid_until_date => profile.paid_until_date,
                                                               :period => extract_period_from_product_list(remaining_products))
           end
@@ -172,8 +207,8 @@ module BillingLogic::Strategies
       products.first.billing_cycle.period
     end
 
-    def remove_products_from_profile(profile)
-      profile.products.reject { |product| products_to_be_removed.include?(product) }
+    def remaining_products_after_product_removal_from_profile(profile)
+      profile.active_products.reject { |product| products_to_be_removed.include?(product) }
     end
 
     def removed_products_from_profile(profile)
