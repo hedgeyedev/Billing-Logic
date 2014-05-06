@@ -122,6 +122,7 @@ module BillingLogic::Strategies
         elsif (previous_product = changed_product_subscription?(product))
           update_product_billing_cycle_and_payment!(product, previous_product)
           date = next_payment_date_from_product(product, previous_product)
+          puts "date #{date.inspect}"
         end
         date = (date.nil? || date < today) ? today : date
         group[date] ||= []
@@ -150,14 +151,13 @@ module BillingLogic::Strategies
 
     def update_product_billing_cycle_and_payment!(product, previous_product)
       if product.billing_cycle.periodicity > previous_product.billing_cycle.periodicity
-        product.initial_payment = product.price
         product.billing_cycle.anniversary = previous_product.billing_cycle.anniversary
       end
     end
 
     def next_payment_date_from_product(product, previous_product)
       if product.billing_cycle.periodicity > previous_product.billing_cycle.periodicity
-        product.billing_cycle.next_payment_date
+        product.billing_cycle.anniversary
       else
         product.billing_cycle.anniversary = next_payment_date_from_profile_with_product(product, :active => true)
       end
