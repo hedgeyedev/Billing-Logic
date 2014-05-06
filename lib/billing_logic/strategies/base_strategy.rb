@@ -122,7 +122,6 @@ module BillingLogic::Strategies
         elsif (previous_product = changed_product_subscription?(product))
           update_product_billing_cycle_and_payment!(product, previous_product)
           date = next_payment_date_from_product(product, previous_product)
-          puts "date #{date.inspect}"
         end
         date = (date.nil? || date < today) ? today : date
         group[date] ||= []
