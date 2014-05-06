@@ -1,7 +1,10 @@
 #!/bin/bash -li
 set -o errexit
-echo '*** starting Billing-Logic build ***' &>/dev/stderr
-echo '*** before whoami ***' &>/dev/stderr
-whoami &>/dev/stderr
+echo The path to the Hedgeye Utilities is $HEDGEYE_UTILITIES_PATH
+source $HEDGEYE_UTILITIES_PATH/set_up_rvm
+mkdir -p temp/pids
+git checkout master
+git pull origin master
 bundle install
 bundle exec rake ci
+# /bin/bash --login -- ~/work/yard_use/generate_ruby19_docs.shecho '*** starting Billing-Logic build ***' &>/dev/stderr

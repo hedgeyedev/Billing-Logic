@@ -29,6 +29,7 @@
             class IndependentPaymentStrategy
             class SinglePaymentStrategy
 
+
 == BillingLogic::Strategies
 
 You create a BillingLogic::Strategy by passing in a hash with your current state, desired state and builder class:
@@ -42,6 +43,7 @@ You then ask the strategy to return you an array of commands:
     strategy.command_list => An Array of commands provided by the command builder class
 
 There are three strategies available:
+
 - BaseStrategy:
   - Contains most of the methods
 - IndependentPaymentStrategy:
@@ -62,6 +64,7 @@ BaseStrategy also has these public methods:
     #profiles_by_status(active_or_pending)
 
 == BillingLogic::BillingCycle
+
 constants:
     TIME_UNITS = { :day => 1, :week => 7, :month => 365/12.0, :semimonth=> 365/24, :year => 365 }
 
