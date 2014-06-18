@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   # because activesupport forgot to require tzinfo
   # see https://github.com/rails/rails/issues/4909
   # can remove once we upgrade activesupport
-  s.add_development_dependency("tzinfo")
+  # s.add_development_dependency("tzinfo")
 
   s.add_development_dependency("awesome_print")
   s.add_development_dependency("rspec", '~> 2.12')
