@@ -9,5 +9,7 @@ vendor
 .yardoc/
 
 # https://stackoverflow.com/questions/9645481/rails-and-rake-raketasks
+*.ipr
 *.iml
+*.iws
 .rakeTasks
