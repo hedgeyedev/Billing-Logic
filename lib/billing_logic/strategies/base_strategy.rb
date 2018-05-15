@@ -1,7 +1,12 @@
 require 'forwardable'
 
 module BillingLogic::Strategies
-
+  # Because this is no longer the behavior in Ruby 2(.3?)
+  class ToStringArray < Array
+    def to_s
+      "[#{map { |child| child.to_s }.join(', ')}]"
+    end
+  end
   # The BaseStrategy defines generic functions used by various BillingLogic::Strategies.
   class BaseStrategy
 
@@ -10,7 +15,7 @@ module BillingLogic::Strategies
     def initialize(opts = {})
       @current_state = opts.delete(:current_state) || []
       @desired_state = opts.delete(:desired_state) || []
-      @command_list = []
+      @command_list = ToStringArray.new
       @payment_command_builder_class = opts.delete(:payment_command_builder_class) || default_command_builder
     end
 
@@ -181,9 +186,9 @@ module BillingLogic::Strategies
           @command_list << cancel_recurring_payment_command(profile, refund_options)
 
         elsif remaining_products.size == profile.products.size # nothing has changed
-          #
-          # do nothing
-          #
+        #
+        # do nothing
+        #
         else  # only some products are being removed and the profile needs to be updated
 
           if remaining_products.size >= 1
