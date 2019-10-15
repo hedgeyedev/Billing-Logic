@@ -11,6 +11,16 @@ And /^I made the following payment: paid (#{MONEY}) for (#{PRODUCT_FORMATTING}) 
   end
 end
 
+And /^I made the following payment: (.*,.*)$/ do |payment_strings|
+  payment_strings.split(',').each do |payment_string|
+    step "I made the following payment: #{payment_string.strip}"
+  end
+end
+
+Given(/^I made the following payment: (none|nothing)?$/) do |throwaway|
+  # Nothing to be done here
+end
+
 Given /^The cancellation grace period is of (\d+) (hour|day|month|week|year)s?$/ do |amount, length|
   grace_period(amount.to_i * 60 * 60)
 end
