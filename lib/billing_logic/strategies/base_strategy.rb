@@ -227,7 +227,7 @@ module BillingLogic::Strategies
       if !profile.refundable_payment_amount(removed_products_from_profile(profile)).zero?
         ret.merge!(refund_recurring_payments_command(profile.identifier, profile.refundable_payment_amount(removed_products_from_profile(profile))))
         ret.merge!(disable_subscription(profile.identifier))
-      elsif ((Date.current - 1) <= profile.billing_start_date) && (Date.current >= profile.billing_start_date)
+      elsif ((Date.current - 1) <= profile.billing_start_date) # && (Date.current >= profile.billing_start_date)
         ret.merge!(disable_subscription(profile.identifier))
       end
       ret

@@ -18,7 +18,7 @@ Feature: Independent Payment Strategy
       Given I support Independent Payment Strategy
       And   Today is 3/15/12
       And   I have the following subscriptions:
-        | (A @ $30/mo & B @ $40/mo & C @ $25/mo) @ $95/mo | active | and the next billing date is on | 4/1/12 |
+        | (A @ $30/mo & B @ $40/mo & C @ $25/mo) @ $95/mo | active | and the next billing date is on | 4/1/12 | 3/1/12 |
      When  I change to having: <desired state>
      Then  I expect the following action: <action>
      Examples: Removing all products
@@ -35,11 +35,11 @@ Feature: Independent Payment Strategy
      And   Today is 3/15/12
      And   I have the following subscriptions:
      # | product names | billing cycle        | status    | #comments                      | next billing date   |
-       | A @ $30/mo | active    | with current permissions and the next billing date is on | 4/1/12              |
-       | B @ $20/mo | active    | with current permissions and the next billing date is on | 4/20/12             |
-       | C @ $50/yr | cancelled | with permissions expiring in the future on               | 4/25/12             |
-       | F @ $10/mo | cancelled | with permissions expiring today                          | 3/15/12             |
-       | G @ $15/mo | cancelled | with permissions expired in the past on                  | 3/13/12             |
+       | A @ $30/mo | active    | with current permissions and the next billing date is on | 4/1/12              | 3/1/12 |
+       | B @ $20/mo | active    | with current permissions and the next billing date is on | 3/20/12             | 2/20/12 |
+       | C @ $50/yr | cancelled | with permissions expiring in the future on               | 4/25/12             | 4/25/11 |
+       | F @ $10/mo | cancelled | with permissions expiring today                          | 3/15/12             | 2/15/12 |
+       | G @ $15/mo | cancelled | with permissions expired in the past on                  | 3/13/12             | 2/13/12 |
      When  I change to having: <desired state>
      Then  I expect the following action: <action>
      Examples: Removing all products
