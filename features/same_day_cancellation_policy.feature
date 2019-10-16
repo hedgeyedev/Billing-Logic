@@ -34,7 +34,7 @@ Feature: Same Day Cancellation Policy
     And   Today is 3/15/12
     And   I have the following subscriptions:
      #| product names | status | comments                                                 | next billing date |
-      | (A @ $30/mo & B @ $40/mo & C @ $25/mo) @ $95/mo | active | and the next billing date is on | 4/1/12 |
+      | (A @ $30/mo & B @ $40/mo & C @ $25/mo) @ $95/mo | active | and the next billing date is on | 4/14/12 |
     And   I made the following payment: <payment made>
     When  I change to having: <desired state>
     Then  I expect the following action: <actions>
