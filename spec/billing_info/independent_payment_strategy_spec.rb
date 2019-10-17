@@ -36,6 +36,7 @@ module BillingLogic
             :active_products =>   [product_a, product_b],
             :price => 30,
             :identifier => 'i-1',
+            :billing_start_date => monthly_cycle.anniversary,
             :paid_until_date => monthly_cycle.next_payment_date,
             :active_or_pending => true
            )
@@ -48,6 +49,7 @@ module BillingLogic
                      :active_products => [],
                      :price => 40,
                      :identifier => 'i-4',
+                     :billing_start_date => monthly_cycle.anniversary,
                      :paid_until_date => monthly_cycle.next_payment_date,
                      :active_or_pending => false,
                     )
@@ -60,6 +62,7 @@ module BillingLogic
                      :active_products => [product_c],
                      :price => 30,
                      :identifier => 'i-2',
+                     :billing_start_date => monthly_cycle.anniversary,
                      :paid_until_date => monthly_cycle.next_payment_date,
                      :active_or_pending => true,
                      )

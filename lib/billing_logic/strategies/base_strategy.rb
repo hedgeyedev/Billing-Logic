@@ -106,8 +106,8 @@ module BillingLogic::Strategies
 
     def calculate_list
       reset_command_list!
-      add_commands_for_products_to_be_added!
       add_commands_for_products_to_be_removed!
+      add_commands_for_products_to_be_added!
     end
 
     # NOTE: This method is the most likely to be have different implementations in
@@ -125,8 +125,10 @@ module BillingLogic::Strategies
         if previously_cancelled_product?(product)
           date = next_payment_date_from_profile_with_product(product, :active => false)
         elsif (previous_product = changed_product_subscription?(product))
-          update_product_billing_cycle_and_payment!(product, previous_product)
-          date = next_payment_date_from_product(product, previous_product)
+          unless previous_product_was_disabled?(product, previous_product)
+            update_product_billing_cycle_and_payment!(product, previous_product)
+            date = next_payment_date_from_product(product, previous_product)
+          end
         end
         date = (date.nil? || date < today) ? today : date
         group[date] ||= []
@@ -164,6 +166,12 @@ module BillingLogic::Strategies
         product.billing_cycle.anniversary
       else
         product.billing_cycle.anniversary = next_payment_date_from_profile_with_product(product, :active => true)
+      end
+    end
+
+    def previous_product_was_disabled?(product, previous_product)
+      @command_list.compact.detect do |command|
+        command.products.any? {|product| product.identifier == previous_product.identifier } && command.disable
       end
     end
 
@@ -221,8 +229,10 @@ module BillingLogic::Strategies
 
     def issue_refunds_if_necessary(profile)
       ret = {}
-      unless profile.refundable_payment_amount(removed_products_from_profile(profile)).zero?
+      if !profile.refundable_payment_amount(removed_products_from_profile(profile)).zero?
         ret.merge!(refund_recurring_payments_command(profile.identifier, profile.refundable_payment_amount(removed_products_from_profile(profile))))
+        ret.merge!(disable_subscription(profile.identifier))
+      elsif ((Date.current - 1) <= profile.billing_start_date) # && (Date.current >= profile.billing_start_date)
         ret.merge!(disable_subscription(profile.identifier))
       end
       ret

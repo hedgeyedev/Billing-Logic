@@ -35,7 +35,8 @@ class MockProduct
 end
 
 class MockProfile
-  attr_accessor :identifier, :products, :price, :paid_until_date, :billing_cycle, :active_or_pending, :current_products, :active_products
+  attr_accessor :identifier, :products, :price, :paid_until_date, :billing_cycle, :active_or_pending,
+                :current_products, :active_products, :billing_start_date
 
   # Example:
   #   MockProfile.new(:products => [product_d],

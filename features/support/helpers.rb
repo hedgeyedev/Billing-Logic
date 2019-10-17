@@ -6,9 +6,10 @@ end
 
 module ProductPaymentHelpers
   def create_payment_for_profile_at_date(profile, amount, payment_date)
+    refundable = (Time.now - payment_date.to_time).to_i < grace_period && ((Date.current - 1) <= profile.billing_start_date)
     profile.last_payment = OpenStruct.new(:amount => amount.to_i,
                                           :payment_date => payment_date,
-                                          :refundable? => (Time.now - payment_date.to_time).to_i < grace_period)
+                                          :refundable? => refundable)
 
     def profile.refundable_payment_amount(foo)
       last_payment.refundable? ? last_payment.amount : 0.0
