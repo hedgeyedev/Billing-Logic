@@ -13,9 +13,9 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "billing_logic"
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = Dir["{config,features,lib,spec}/**/*", "README.rdoc"]
+  s.test_files    = Dir["{features,spec}/**/*"]
+  s.executables   = Dir["bin/**/*"].map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
   s.add_dependency("activesupport", '~> 4.0.0')
 
