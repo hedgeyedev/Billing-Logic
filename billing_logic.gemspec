@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.test_files    = Dir["{features,spec}/**/*"]
   s.executables   = Dir["bin/**/*"].map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
-  s.add_dependency("activesupport", '~> 4.0.0')
+  s.add_dependency("activesupport", '~> 4.0')
 
   # because activesupport forgot to require tzinfo
   # see https://github.com/rails/rails/issues/4909
